@@ -10,6 +10,7 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
+    "@iconify-json/mdi": "^1.1.66",
     "@nuxt/ui": "^2.15.2",
     "nuxt": "^3.11.2",
     "vue": "^3.4.21",
