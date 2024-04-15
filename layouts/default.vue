@@ -11,17 +11,17 @@ import { ref } from 'vue';
 
 const navItems = ref([
     [
-        { label: "Yoo", icon: "i-heroicons-home", to: "/" },
+        { label: "Yoo", icon: "i-heroicons-home", to: "/", class: "border-spacing-x-28" },
     ],
     [
-        { label: "Emploi du temps", icon: "i-heroicons-table-cells", to: "emploidutemps" },
-        { label: "Enseignants", icon: "i-heroicons-academic-cap", to: "enseignants" },
-        { label: "Salles", icon: "i-heroicons-building-office", to: "salles" },
-        { label: "Cours", icon: "i-heroicons-book-open", to: "cours" }
+        { label: "Emploi du temps", icon: "i-heroicons-table-cells", to: "emploidutemps", class: "border-spacing-x-28" },
+        { label: "Enseignants", icon: "i-heroicons-academic-cap", to: "enseignants", class: "border-spacing-x-28" },
+        { label: "Salles", icon: "i-heroicons-building-office", to: "salles", class: "border-spacing-x-28" },
+        { label: "Cours", icon: "i-heroicons-book-open", to: "cours", class: "border-spacing-x-28" }
     ],
     [
-        { to: "help", label: "Aide", icon: "i-heroicons-question-mark-circle" },
-        { to: "about", label: "A propos", icon: "i-heroicons-information-circle" }
+        { to: "help", label: "Aide", icon: "i-heroicons-question-mark-circle", class: "border-spacing-x-28" },
+        { to: "about", label: "A propos", icon: "i-heroicons-information-circle", class: "border-spacing-x-28" }
     ]
 ]);
 </script>
