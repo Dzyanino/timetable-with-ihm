@@ -1,5 +1,5 @@
 <template>
-    <v-container fluid>
+    <v-container fluid class="px-2 px-md-4 px-lg-8">
       <Timetable />
     </v-container>
 </template>

@@ -7,7 +7,7 @@
             </template>
 
             <v-app-bar-title>
-                <v-btn variant="plain" class="text-no-wrap" link to="/">Fotoana</v-btn>
+                <v-btn variant="plain" class="text-no-wrap text-green" link to="/">Fotoana</v-btn>
             </v-app-bar-title>
 
             <v-spacer class="d-none d-lg-flex"></v-spacer>
@@ -37,7 +37,7 @@
             </template>
         </v-navigation-drawer>
 
-        <v-main>
+        <v-main class="bg-green-lighten-5">
             <slot />
         </v-main>
     </v-app>
