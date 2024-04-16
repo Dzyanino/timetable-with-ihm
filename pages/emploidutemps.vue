@@ -2,69 +2,57 @@
     <div class="my-2 md:my-4 lg:my-6">
         <UTable :columns="tableColumns" :rows="tableRows" class="border rounded-md">
             <template #heures-data>
-                <div class="py-4 text-center" v-for="heure in tableRows[0].heures" :key="heure.label">
+                <div class="text-center" v-for="heure in tableRows[0].heures" :key="heure.label">
                     <span>{{ heure.label }}</span>
                 </div>
             </template>
             <template #lun-data>
-                <template class="flex align-middle justify-evenly">
                     <div class="text-center flex flex-col" v-for="lundi in tableRows[0].lun" :key="lundi.id">
                         <span>{{ lundi.classe }}</span>
                         <span class="font-bold uppercase">{{ lundi.matiere }}</span>
                         <span>{{ lundi.prof }}</span>
                         <span class="font-bold">{{ lundi.salle }}</span>
                     </div>
-                </template>
             </template>
             <template #mar-data>
-                <template class="flex align-middle justify-evenly">
                     <div class="text-center flex flex-col" v-for="mardi in tableRows[0].mar" :key="mardi.id">
                         <span>{{ mardi.classe }}</span>
                         <span class="font-bold uppercase">{{ mardi.matiere }}</span>
                         <span>{{ mardi.prof }}</span>
                         <span class="font-bold">{{ mardi.salle }}</span>
                     </div>
-                </template>
             </template>
             <template #mer-data>
-                <template class="flex align-middle justify-evenly">
                     <div class="text-center flex flex-col" v-for="mercredi in tableRows[0].mer" :key="mercredi.id">
                         <span>{{ mercredi.classe }}</span>
                         <span class="font-bold uppercase">{{ mercredi.matiere }}</span>
                         <span>{{ mercredi.prof }}</span>
                         <span class="font-bold">{{ mercredi.salle }}</span>
                     </div>
-                </template>
             </template>
             <template #jeu-data>
-                <template class="flex align-middle justify-evenly">
                     <div class="text-center flex flex-col" v-for="jeudi in tableRows[0].jeu" :key="jeudi.id">
                         <span>{{ jeudi.classe }}</span>
                         <span class="font-bold uppercase">{{ jeudi.matiere }}</span>
                         <span>{{ jeudi.prof }}</span>
                         <span class="font-bold">{{ jeudi.salle }}</span>
                     </div>
-                </template>
             </template>
             <template #ven-data>
-                <template class="flex align-middle justify-evenly">
                     <div class="text-center flex flex-col" v-for="vendredi in tableRows[0].ven" :key="vendredi.id">
                         <span>{{ vendredi.classe }}</span>
                         <span class="font-bold uppercase">{{ vendredi.matiere }}</span>
                         <span>{{ vendredi.prof }}</span>
                         <span class="font-bold">{{ vendredi.salle }}</span>
                     </div>
-                </template>
             </template>
             <template #sam-data>
-                <template class="flex align-middle justify-evenly">
                     <div class="text-center flex flex-col" v-for="samedi in tableRows[0].sam" :key="samedi.id">
                         <span>{{ samedi.classe }}</span>
                         <span class="font-bold uppercase">{{ samedi.matiere }}</span>
                         <span>{{ samedi.prof }}</span>
                         <span class="font-bold">{{ samedi.salle }}</span>
                     </div>
-                </template>
             </template>
         </UTable>
     </div>
@@ -129,6 +117,34 @@ const tableRows = ref([
                 prof: "William",
                 salle: "001"
             },
+            {
+                id: 5,
+                classe: "L1 IG",
+                matiere: "Analyse",
+                prof: "Benedicte",
+                salle: "012"
+            },
+            {
+                id: 6,
+                classe: "M2 GB",
+                matiere: "Scrum",
+                prof: "Haja",
+                salle: "112"
+            },
+            {
+                id: 9,
+                classe: "M1 IG",
+                matiere: "Anal Num",
+                prof: "Ralaivao",
+                salle: "104"
+            },
+            {
+                id: 10,
+                classe: "M2 GB",
+                matiere: "Agile",
+                prof: "Gilante",
+                salle: "008"
+            },
         ],
         mar: [
             {
@@ -146,22 +162,7 @@ const tableRows = ref([
                 salle: "106"
             },
         ],
-        mer: [
-            {
-                id: 5,
-                classe: "L1 IG",
-                matiere: "Analyse",
-                prof: "Benedicte",
-                salle: "012"
-            },
-            {
-                id: 6,
-                classe: "M2 GB",
-                matiere: "Scrum",
-                prof: "Haja",
-                salle: "112"
-            },
-        ],
+        mer: [],
         jeu: [
             {
                 id: 7,
@@ -178,24 +179,8 @@ const tableRows = ref([
                 salle: "001"
             },
         ],
-        ven: [
-            {
-                id: 9,
-                classe: "M1 IG",
-                matiere: "Anal Num",
-                prof: "Ralaivao",
-                salle: "104"
-            },
-            {
-                id: 10,
-                classe: "M2 GB",
-                matiere: "Agile",
-                prof: "Gilante",
-                salle: "008"
-            },
-        ],
-        sam: [
-            {
+        ven: [],
+        sam: [            {
                 id: 11,
                 classe: "L1 IG",
                 matiere: "Unix",
@@ -212,10 +197,4 @@ const tableRows = ref([
         ],
     }
 ])
-
-tableRows.value.forEach(first => {
-    first.heures.forEach(heure => {
-        console.log(heure);
-    });
-});
 </script>
