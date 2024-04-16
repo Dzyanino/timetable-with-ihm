@@ -39,7 +39,7 @@
             </template>
         </v-navigation-drawer>
 
-        <v-main class="bg-green-lighten-5">
+        <v-main class="bg-grey-lighten-5">
             <slot />
         </v-main>
     </v-app>
