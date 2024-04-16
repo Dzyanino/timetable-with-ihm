@@ -13,11 +13,13 @@
             <v-spacer class="d-none d-lg-flex"></v-spacer>
 
             <div v-for="preLink in navBarLink[0]" :key="preLink.to" class="d-none d-md-flex">
-                <v-btn :prepend-icon="'mdi-' + preLink.icon" :text="preLink.label" :to="preLink.to" class="mx-1"></v-btn>
+                <v-btn :prepend-icon="'mdi-' + preLink.icon" :text="preLink.label" :to="preLink.to"
+                    class="mx-1"></v-btn>
             </div>
             <v-spacer class="d-none d-lg-flex"></v-spacer>
             <div v-for="postLink in navBarLink[1]" :key="postLink.to" class="d-none d-md-flex">
-                <v-btn :prepend-icon="'mdi-' + postLink.icon" :text="postLink.label" :to="postLink.to"class="mx-1"></v-btn>
+                <v-btn :prepend-icon="'mdi-' + postLink.icon" :text="postLink.label" :to="postLink.to"
+                    class="mx-1"></v-btn>
             </div>
         </v-app-bar>
 
