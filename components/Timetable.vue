@@ -307,8 +307,6 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
-
 const joursSemaine = ["lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi"];
 
 const tableHeaders = ref([

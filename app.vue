@@ -7,7 +7,7 @@
 <style>
 .layout-enter-active,
 .layout-leave-active {
-    transition: all 0.25s;
+    transition: all 0.3s;
 }
 
 .layout-enter-from,
@@ -18,10 +18,13 @@
 
 .slide-enter-active,
 .slide-leave-active {
-    transition: all 0.25s;
+    transition: all 0.3s;
 }
 
-.slide-enter-from,
+.slide-enter-from {
+    opacity: 0;
+    transform: translateX(15px);
+}
 .slide-leave-to {
     opacity: 0;
     transform: translateX(-15px);

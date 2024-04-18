@@ -5,8 +5,6 @@
 </template>
 
 <script setup>
-import Timetable from '../components/timetable.vue';
-
 useHead({
   title: "Emploi du temps"
 })
