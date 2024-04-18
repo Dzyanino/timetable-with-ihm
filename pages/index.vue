@@ -1,6 +1,6 @@
 <template>
   <div align="center">
-    <v-btn to="/emploidutemps" text="Getting started" append-icon="mdi-arrow-right"></v-btn>
+    <v-btn to="/emploidutemps" text="Getting started" append-icon="mdi-arrow-right" />
   </div>
 </template>
 

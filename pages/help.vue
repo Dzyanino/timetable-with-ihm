@@ -10,6 +10,9 @@ useHead({
 })
 
 definePageMeta({
-layout: "main-layout",
+  layout: "main-layout",
+  pageTransition: {
+    name: 'slide'
+  },
 })
 </script>
