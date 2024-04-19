@@ -30,4 +30,14 @@ export default defineNuxtConfig({
     },
   },
   devtools: { enabled: false },
+  // runtimeConfig: {
+  //   dbName: process.env.DATABASE_NAME,
+  //   username: process.env.USERNAME,
+  //   password: process.env.PASSWORD,
+  //   host: process.env.HOST,
+  //   dialect: process.env.DIALECT,
+  // },
+  // nitro: {
+  //   plugins: ["~/server/index.ts"],
+  // },
 })
