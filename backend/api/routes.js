@@ -5,14 +5,51 @@ const { body, validationResult } = require("express-validator")
 
 
 
+// GET EDT --------------------------------------------------------------------
+router.get('/edt', async (request, response) => {
+    const edt = await Edt.findAll({ order: ['date'], limit: 72 });
+    response.json(edt);
+})
+
+// GET ELEMENT CONST --------------------------------------------------------------------
+router.get('/element', async (request, response) => {
+    const element = await ElementConst.findAll();
+    response.json(element);
+})
+
+// GET ENSEIGNANT --------------------------------------------------------------------
+router.get('/enseignant', async (request, response) => {
+    const enseignant = await Enseignant.findAll();
+    response.json(enseignant);
+})
+// GET GRADE --------------------------------------------------------------------
+router.get('/grade', async (request, response) => {
+    const grade = Grade.findAll();
+    response.json(grade);
+})
+// GET MENTION --------------------------------------------------------------------
+router.get('/mention', async (request, response) => {
+    const mention = await Mention.findAll();
+    response.json(mention);
+})
+
 // GET PARCOURS --------------------------------------------------------------------
 router.get('/parcours', async (request, response) => {
     const parcours = await Parcours.findAll();
     response.json(parcours);
 })
 
+// GET SALLE --------------------------------------------------------------------
+router.get('/salle', async (request, response) => {
+    const salle = await Salle.findAll();
+    response.json(salle);
+})
 
-
+// GET UNITE ENS --------------------------------------------------------------------
+router.get('/unite', async (request, response) => {
+    const unite = await UniteEns.findAll();
+    response.json(unite);
+})
 
 // // GET ALL --------------------------------------------------------------------
 // router.get('/enseignants', async (request, response) => {
