@@ -1,8 +1,8 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 
-import vuetify, { transformAssetUrls } from 'vite-plugin-vuetify'
-
 export default defineNuxtConfig({
+  devtools: { enabled: false },
+
   app: {
     head: {
       charset: "utf-8",
@@ -11,23 +11,22 @@ export default defineNuxtConfig({
     layoutTransition: { name: 'layout', mode: 'out-in' },
     pageTransition: { name: 'slide', mode: 'out-in' }
   },
-  build: {
-    transpile: ['vuetify'],
+
+  modules: ["@nuxtjs/supabase", "vuetify-nuxt-module"],
+
+  supabase: {
+    url: process.env.SUPABASE_URL,
+    key: process.env.SUPABASE_KEY,
+    serviceKey: process.env.SUPABASE_SERVICE_KEY,
+    redirect: false,
   },
-  modules: [
-    (_options, nuxt) => {
-      nuxt.hooks.hook('vite:extendConfig', (config) => {
-        // @ts-expect-error
-        config.plugins.push(vuetify({ autoImport: true }))
-      })
-    },
-  ],
-  vite: {
-    vue: {
-      template: {
-        transformAssetUrls,
-      },
-    },
-  },
-  devtools: { enabled: false },
+
+  vuetify: {
+    vuetifyOptions: {
+      directives: true,
+      icons: {
+        defaultSet: "mdi",
+      }
+    }
+  }
 })
