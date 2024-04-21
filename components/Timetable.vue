@@ -1,3 +1,157 @@
+<script setup>
+const joursSemaine = ["lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi"];
+
+const tableHeaders = ref([
+    {
+        title: "Lundi",
+        key: "lun",
+        sortable: false,
+        minWidth: "250px",
+    },
+    {
+        title: "Mardi",
+        key: "mar",
+        sortable: false,
+        minWidth: "250px",
+    },
+    {
+        title: "Mercredi",
+        key: "mer",
+        sortable: false,
+        minWidth: "250px",
+    },
+    {
+        title: "Jeudi",
+        key: "jeu",
+        sortable: false,
+        minWidth: "250px",
+    },
+    {
+        title: "Vendredi",
+        key: "ven",
+        sortable: false,
+        minWidth: "250px",
+    },
+    {
+        title: "Samedi",
+        key: "sam",
+        sortable: false,
+        minWidth: "250px",
+    },
+]);
+
+const tableItems = ref([
+    {
+        heures: [
+            "07:30 - 09:00",
+            "09:00 - 10:30",
+            "10:30 - 12:00",
+            "13:30 - 15:00",
+            "15:00 - 16:30",
+            "16:30 - 18:00",
+        ],
+        lundi: {
+            prem: [
+                { id: 1, groupe: ["IG"], matiere: "Ass App", prof: "Michel", salle: "001" },
+                { id: 2, groupe: ["GB", "ASR"], matiere: "Comptabilité", prof: "Hanta", salle: "004" },
+            ],
+            deux: [
+                { id: 3, groupe: ["GB"], matiere: "Algo", prof: "Cyprien", salle: "012" },
+            ],
+            trois: [
+                { id: 3, groupe: ["ASR", "IG"], matiere: "Admin Unix", prof: "Clément", salle: "104" },
+            ],
+            quatre: [],
+            cinq: [],
+            six: [],
+        },
+        mardi: {
+            prem: [
+                { id: 4, groupe: ["ASR"], matiere: "VPN", prof: "Siaka", salle: "106" },
+                { id: 5, groupe: ["IG"], matiere: "Algo", prof: "Cyprien", salle: "012" },
+            ],
+            deux: [],
+            trois: [
+                { id: 6, groupe: ["GB", "IG"], matiere: "C#", prof: "Ferdinand", salle: "210" },
+            ],
+            quatre: [],
+            cinq: [],
+            six: [],
+        },
+        mercredi: {
+            prem: [],
+            deux: [
+                { id: 4, groupe: ["ASR"], matiere: "VPN", prof: "Siaka", salle: "106" },
+            ],
+            trois: [],
+            quatre: [],
+            cinq: [
+                { id: 5, groupe: ["IG"], matiere: "Algo", prof: "Cyprien", salle: "012" },
+                { id: 4, groupe: ["ASR"], matiere: "VPN", prof: "Siaka", salle: "106" },
+            ],
+            six: [
+                { id: 6, groupe: ["GB", "IG"], matiere: "C#", prof: "Ferdinand", salle: "210" },
+            ],
+        },
+        jeudi: {
+            prem: [
+                { id: 5, groupe: ["IG"], matiere: "Algo", prof: "Cyprien", salle: "012" },
+            ],
+            deux: [],
+            trois: [
+                { id: 6, groupe: ["GB", "IG"], matiere: "C#", prof: "Ferdinand", salle: "210" },
+            ],
+            quatre: [
+                { id: 4, groupe: ["ASR"], matiere: "VPN", prof: "Siaka", salle: "106" },
+            ],
+            cinq: [],
+            six: [
+                { id: 4, groupe: ["ASR"], matiere: "VPN", prof: "Siaka", salle: "106" },
+                { id: 6, groupe: ["GB", "IG"], matiere: "C#", prof: "Ferdinand", salle: "210" },
+
+            ],
+        },
+        vendredi: {
+            prem: [],
+            deux: [],
+            trois: [
+                { id: 6, groupe: ["GB", "IG"], matiere: "C#", prof: "Ferdinand", salle: "210" },
+            ],
+            quatre: [],
+            cinq: [
+                { id: 4, groupe: ["ASR"], matiere: "VPN", prof: "Siaka", salle: "106" },
+                { id: 5, groupe: ["IG"], matiere: "Algo", prof: "Cyprien", salle: "012" },
+            ],
+            six: [],
+        },
+        samedi: {
+            prem: [],
+            deux: [],
+            trois: [],
+            quatre: [
+                // { id: 5, groupe: ["IG"], matiere: "Algo", prof: "Cyprien", salle: "012" },
+            ],
+            cinq: [],
+            six: [
+                // { id: 6, groupe: ["GB", "IG"], matiere: "C#", prof: "Ferdinand", salle: "210" },
+                // { id: 4, groupe: ["ASR"], matiere: "VPN", prof: "Siaka", salle: "106" },
+            ],
+        },
+    }
+]);
+
+const editerDialog = ref(false);
+const ajouterDialog = ref(false);
+
+
+const EDT = ref([]);
+
+onMounted(async () => {
+    const EDT = $fetch('/api/edt');
+})
+
+</script>
+
 <template>
     <div>
         <v-row class="pb-2">
@@ -305,161 +459,6 @@
         </v-card>
     </v-dialog>
 </template>
-
-<script setup>
-const joursSemaine = ["lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi"];
-
-const tableHeaders = ref([
-    {
-        title: "Lundi",
-        key: "lun",
-        sortable: false,
-        minWidth: "250px",
-    },
-    {
-        title: "Mardi",
-        key: "mar",
-        sortable: false,
-        minWidth: "250px",
-    },
-    {
-        title: "Mercredi",
-        key: "mer",
-        sortable: false,
-        minWidth: "250px",
-    },
-    {
-        title: "Jeudi",
-        key: "jeu",
-        sortable: false,
-        minWidth: "250px",
-    },
-    {
-        title: "Vendredi",
-        key: "ven",
-        sortable: false,
-        minWidth: "250px",
-    },
-    {
-        title: "Samedi",
-        key: "sam",
-        sortable: false,
-        minWidth: "250px",
-    },
-]);
-
-const tableItems = ref([
-    {
-        heures: [
-            "07:30 - 09:00",
-            "09:00 - 10:30",
-            "10:30 - 12:00",
-            "13:30 - 15:00",
-            "15:00 - 16:30",
-            "16:30 - 18:00",
-        ],
-        lundi: {
-            prem: [
-                { id: 1, groupe: ["IG"], matiere: "Ass App", prof: "Michel", salle: "001" },
-                { id: 2, groupe: ["GB", "ASR"], matiere: "Comptabilité", prof: "Hanta", salle: "004" },
-            ],
-            deux: [
-                { id: 3, groupe: ["GB"], matiere: "Algo", prof: "Cyprien", salle: "012" },
-            ],
-            trois: [
-                { id: 3, groupe: ["ASR", "IG"], matiere: "Admin Unix", prof: "Clément", salle: "104" },
-            ],
-            quatre: [],
-            cinq: [],
-            six: [],
-        },
-        mardi: {
-            prem: [
-                { id: 4, groupe: ["ASR"], matiere: "VPN", prof: "Siaka", salle: "106" },
-                { id: 5, groupe: ["IG"], matiere: "Algo", prof: "Cyprien", salle: "012" },
-            ],
-            deux: [],
-            trois: [
-                { id: 6, groupe: ["GB", "IG"], matiere: "C#", prof: "Ferdinand", salle: "210" },
-            ],
-            quatre: [],
-            cinq: [],
-            six: [],
-        },
-        mercredi: {
-            prem: [],
-            deux: [
-                { id: 4, groupe: ["ASR"], matiere: "VPN", prof: "Siaka", salle: "106" },
-            ],
-            trois: [],
-            quatre: [],
-            cinq: [
-                { id: 5, groupe: ["IG"], matiere: "Algo", prof: "Cyprien", salle: "012" },
-                { id: 4, groupe: ["ASR"], matiere: "VPN", prof: "Siaka", salle: "106" },
-            ],
-            six: [
-                { id: 6, groupe: ["GB", "IG"], matiere: "C#", prof: "Ferdinand", salle: "210" },
-            ],
-        },
-        jeudi: {
-            prem: [
-                { id: 5, groupe: ["IG"], matiere: "Algo", prof: "Cyprien", salle: "012" },
-            ],
-            deux: [],
-            trois: [
-                { id: 6, groupe: ["GB", "IG"], matiere: "C#", prof: "Ferdinand", salle: "210" },
-            ],
-            quatre: [
-                { id: 4, groupe: ["ASR"], matiere: "VPN", prof: "Siaka", salle: "106" },
-            ],
-            cinq: [],
-            six: [
-                { id: 4, groupe: ["ASR"], matiere: "VPN", prof: "Siaka", salle: "106" },
-                { id: 6, groupe: ["GB", "IG"], matiere: "C#", prof: "Ferdinand", salle: "210" },
-
-            ],
-        },
-        vendredi: {
-            prem: [],
-            deux: [],
-            trois: [
-                { id: 6, groupe: ["GB", "IG"], matiere: "C#", prof: "Ferdinand", salle: "210" },
-            ],
-            quatre: [],
-            cinq: [
-                { id: 4, groupe: ["ASR"], matiere: "VPN", prof: "Siaka", salle: "106" },
-                { id: 5, groupe: ["IG"], matiere: "Algo", prof: "Cyprien", salle: "012" },
-            ],
-            six: [],
-        },
-        samedi: {
-            prem: [],
-            deux: [],
-            trois: [],
-            quatre: [
-                // { id: 5, groupe: ["IG"], matiere: "Algo", prof: "Cyprien", salle: "012" },
-            ],
-            cinq: [],
-            six: [
-                // { id: 6, groupe: ["GB", "IG"], matiere: "C#", prof: "Ferdinand", salle: "210" },
-                // { id: 4, groupe: ["ASR"], matiere: "VPN", prof: "Siaka", salle: "106" },
-            ],
-        },
-    }
-]);
-
-const editerDialog = ref(false);
-const ajouterDialog = ref(false);
-
-
-// const EDT = ref([]);
-
-// onMounted(async () => {
-//     const EDT = useFetch('http://localhost:3010/api/parcours');
-//     console.log(EDT)
-// })
-
-</script>
 
 <style>
 .empty-cell-width {
