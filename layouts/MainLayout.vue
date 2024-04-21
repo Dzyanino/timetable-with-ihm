@@ -4,11 +4,11 @@
         <v-app-bar :item="navBarLink" elevation="0" class="border-b" scroll-behavior="elevate">
             <template v-slot:prepend>
                 <v-app-bar-nav-icon class="d-flex d-md-none" @click="nav = !nav" />
+                <v-app-bar-title>
+                    <v-btn variant="plain" class="text-no-wrap text-green" link to="/">Fotoana</v-btn>
+                </v-app-bar-title>
             </template>
 
-            <v-app-bar-title>
-                <v-btn variant="plain" class="text-no-wrap text-green" link to="/">Fotoana</v-btn>
-            </v-app-bar-title>
 
             <v-spacer class="d-none d-md-flex" />
 

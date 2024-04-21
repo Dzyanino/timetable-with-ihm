@@ -450,6 +450,15 @@ const tableItems = ref([
 
 const editerDialog = ref(false);
 const ajouterDialog = ref(false);
+
+
+// const EDT = ref([]);
+
+// onMounted(async () => {
+//     const EDT = useFetch('http://localhost:3010/api/parcours');
+//     console.log(EDT)
+// })
+
 </script>
 
 <style>
