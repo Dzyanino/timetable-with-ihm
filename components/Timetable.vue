@@ -1,6 +1,6 @@
 <script setup>
-const joursSemaine = ["lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi"];
 
+// CONSTANTES ----------------------------------------------------------------------------------
 const tableHeaders = ref([
     {
         title: "Lundi",
@@ -39,7 +39,6 @@ const tableHeaders = ref([
         minWidth: "250px",
     },
 ]);
-
 const tableItems = ref([
     {
         heures: [
@@ -52,24 +51,16 @@ const tableItems = ref([
         ],
         lundi: {
             prem: [
-                { id: 1, groupe: ["IG"], matiere: "Ass App", prof: "Michel", salle: "001" },
-                // { id: 2, groupe: ["GB", "ASR"], matiere: "Comptabilité", prof: "Hanta", salle: "004" },
+                { id: 4, groupe: ["ASR"], matiere: "VPN", prof: "Siaka", salle: "106" },
             ],
-            deux: [
-                { id: 3, groupe: ["GB"], matiere: "Algo", prof: "Cyprien", salle: "012" },
-            ],
-            trois: [
-                // { id: 3, groupe: ["ASR", "IG"], matiere: "Admin Unix", prof: "Clément", salle: "104" },
-            ],
+            deux: [],
+            trois: [],
             quatre: [],
             cinq: [],
             six: [],
         },
         mardi: {
-            prem: [
-                { id: 4, groupe: ["ASR"], matiere: "VPN", prof: "Siaka", salle: "106" },
-                { id: 5, groupe: ["IG"], matiere: "Algo", prof: "Cyprien", salle: "012" },
-            ],
+            prem: [],
             deux: [],
             trois: [
                 // { id: 6, groupe: ["GB", "IG"], matiere: "C#", prof: "Ferdinand", salle: "210" },
@@ -140,15 +131,63 @@ const tableItems = ref([
     }
 ]);
 
+const joursSemaine = ["lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi"];
+const dateActuelle = ref(new Date());
+const debutSemaine = ref(null);
+const finSemaine = ref(null);
+
+const niveau = ref("L1");
+
 const editerDialog = ref(false);
 const ajouterDialog = ref(false);
+// CONSTANTES ----------------------------------------------------------------------------------
+//
+//
+//
+//
+//
+//
+// MADE FONCTIONS -----------------------------------------------------------------------------------
+const formatterDate = (date) => {
+    const annee = date.getFullYear();
+    const mois = (date.getMonth() + 1).toString().padStart(2, '0');
+    const jour = date.getDate().toString().padStart(2, '0');
 
-const fillTable = (data) => {
-    tableItems.value[0].lundi.prem[0] = data
-}
+    return annee + '-' + mois + '-' + jour;
+};
+
+const prendreSemaine = (actualDate) => {
+    const numeroJour = ref(actualDate.getDay());
+
+    debutSemaine.value = new Date(actualDate);
+    debutSemaine.value.setDate(actualDate.getDate() - numeroJour.value + 1);
+    debutSemaine.value = formatterDate(debutSemaine.value);
+
+    finSemaine.value = new Date(actualDate);
+    finSemaine.value.setDate(actualDate.getDate() + (6 - numeroJour.value));
+    finSemaine.value = formatterDate(finSemaine.value);
+};
+
+const initDonnees = async () => {
+    const { edt } = await $fetch('/api/edt',
+    {
+        method: "POST",
+        body: {
+            niveau: niveau.value,
+            debutSemaine: debutSemaine.value,
+            finSemaine: finSemaine.value
+        }
+    });
+};
+
+// const fillTable = (data) => {
+//     tableItems.value[0].lundi.prem[0] = data
+// };
+// MADE FONCTIONS -----------------------------------------------------------------------------------
 
 onMounted(async () => {
-    const { edt } = await $fetch('/api/edt', { method: "POST" });
+    prendreSemaine(dateActuelle.value);
+    await initDonnees();
     // fillTable(edt);
 })
 
