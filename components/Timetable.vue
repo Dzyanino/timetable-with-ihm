@@ -54,11 +54,11 @@ const tableItems = ref([
                 { id: 4, groupe: ["ASR"], matiere: "VPN", prof: "Siaka", salle: "106" },
                 { id: 5, groupe: ["IG"], matiere: "C++", prof: "Cyprien", salle: "001" },
             ],
-            deux: [],
-            trois: [],
-            quatre: [],
-            cinq: [],
-            six: [],
+            deux: [{ id: 5, groupe: ["IG"], matiere: "C++", prof: "Cyprien", salle: "001" },],
+            trois: [{ id: 5, groupe: ["IG"], matiere: "C++", prof: "Cyprien", salle: "001" },],
+            quatre: [{ id: 5, groupe: ["IG"], matiere: "C++", prof: "Cyprien", salle: "001" },],
+            cinq: [{ id: 5, groupe: ["IG"], matiere: "C++", prof: "Cyprien", salle: "001" },],
+            six: [{ id: 5, groupe: ["IG"], matiere: "C++", prof: "Cyprien", salle: "001" },],
         },
         mardi: {
             prem: [],
@@ -207,7 +207,7 @@ onMounted(async () => {
 
             <template v-slot:headers="{ columns }">
                 <tr>
-                    <td class="border-s border-b text-center text-overline" width="150px">#</td>
+                    <td class="border-s border-b text-center text-overline" width="125px">#</td>
                     <template v-for="column in columns" :key="column.key">
                         <td class="border-s border-b text-center text-overline" width="250px">
                             <span>{{ column.title }}</span>
@@ -227,7 +227,7 @@ onMounted(async () => {
                     </td>
                     <template v-for="(jour, index) in joursSemaine" :key="index">
                         <td class="border-s bg-grey-lighten-5 px-0">
-                            <div class="d-flex flex-row align-center justify-center">
+                            <div class="d-flex flex-row align-center justify-center empty-cell-width">
                                 <template v-if="item[jour].prem.length > 0" v-for="horaire in item[jour].prem"
                                     :key="horaire.id">
                                     <v-card class="elevation-0 rounded-0 cellule-hover" width="100%"
@@ -277,7 +277,7 @@ onMounted(async () => {
                     </td>
                     <template v-for="(jour, index) in joursSemaine" :key="index">
                         <td class="border-s bg-grey-lighten-5 px-0">
-                            <div class="d-flex flex-row align-center justify-center">
+                            <div class="d-flex flex-row align-center justify-center empty-cell-width">
                                 <template v-if="item[jour].deux.length > 0" v-for="horaire in item[jour].deux"
                                     :key="horaire.id">
                                     <v-card class="elevation-0 rounded-0 cellule-hover" width="100%"
@@ -327,7 +327,7 @@ onMounted(async () => {
                     </td>
                     <template v-for="(jour, index) in joursSemaine" :key="index">
                         <td class="border-s bg-grey-lighten-5 px-0">
-                            <div class="d-flex flex-row align-center justify-center">
+                            <div class="d-flex flex-row align-center justify-center empty-cell-width">
                                 <template v-if="item[jour].trois.length > 0" v-for="horaire in item[jour].trois"
                                     :key="horaire.id">
                                     <v-card class="elevation-0 rounded-0 cellule-hover" width="100%"
@@ -381,7 +381,7 @@ onMounted(async () => {
                     </td>
                     <template v-for="(jour, index) in joursSemaine" :key="index">
                         <td class="border-s bg-grey-lighten-5 px-0">
-                            <div class="d-flex flex-row align-center justify-center">
+                            <div class="d-flex flex-row align-center justify-center empty-cell-width">
                                 <template v-if="item[jour].quatre.length > 0" v-for="horaire in item[jour].quatre"
                                     :key="horaire.id">
                                     <v-card class="elevation-0 rounded-0 cellule-hover" width="100%"
@@ -431,7 +431,7 @@ onMounted(async () => {
                     </td>
                     <template v-for="(jour, index) in joursSemaine" :key="index">
                         <td class="border-s bg-grey-lighten-5 px-0">
-                            <div class="d-flex flex-row align-center justify-center">
+                            <div class="d-flex flex-row align-center justify-center empty-cell-width">
                                 <template v-if="item[jour].cinq.length > 0" v-for="horaire in item[jour].cinq"
                                     :key="horaire.id">
                                     <v-card class="elevation-0 rounded-0 cellule-hover" width="100%"
@@ -481,7 +481,7 @@ onMounted(async () => {
                     </td>
                     <template v-for="(jour, index) in joursSemaine" :key="index">
                         <td class="border-s bg-grey-lighten-5 px-0">
-                            <div class="d-flex flex-row align-center justify-center">
+                            <div class="d-flex flex-row align-center justify-center empty-cell-width">
                                 <template v-if="item[jour].six.length > 0" v-for="horaire in item[jour].six"
                                     :key="horaire.id">
                                     <v-card class="elevation-0 rounded-0 cellule-hover" width="100%"
