@@ -52,6 +52,7 @@ const tableItems = ref([
         lundi: {
             prem: [
                 { id: 4, groupe: ["ASR"], matiere: "VPN", prof: "Siaka", salle: "106" },
+                { id: 5, groupe: ["IG"], matiere: "C++", prof: "Cyprien", salle: "001" },
             ],
             deux: [],
             trois: [],
@@ -63,7 +64,8 @@ const tableItems = ref([
             prem: [],
             deux: [],
             trois: [
-                // { id: 6, groupe: ["GB", "IG"], matiere: "C#", prof: "Ferdinand", salle: "210" },
+                { id: 6, groupe: ["GB Gr1 - IG"], matiere: "Admin BD", prof: "Guilante", salle: "004" },
+                { id: 7, groupe: ["IG Gr1/Gr2"], matiere: "Java", prof: "Volatiana", salle: "112" },
             ],
             quatre: [],
             cinq: [],
@@ -71,62 +73,38 @@ const tableItems = ref([
         },
         mercredi: {
             prem: [],
-            deux: [
-                { id: 4, groupe: ["ASR"], matiere: "VPN", prof: "Siaka", salle: "106" },
-            ],
-            trois: [],
-            quatre: [],
-            cinq: [
-                // { id: 5, groupe: ["IG"], matiere: "Algo", prof: "Cyprien", salle: "012" },
-                // { id: 4, groupe: ["ASR"], matiere: "VPN", prof: "Siaka", salle: "106" },
-            ],
-            six: [
-                { id: 6, groupe: ["GB", "IG"], matiere: "C#", prof: "Ferdinand", salle: "210" },
-            ],
-        },
-        jeudi: {
-            prem: [
-                { id: 5, groupe: ["IG"], matiere: "Algo", prof: "Cyprien", salle: "012" },
-            ],
             deux: [],
-            trois: [
-                { id: 6, groupe: ["GB", "IG"], matiere: "C#", prof: "Ferdinand", salle: "210" },
-            ],
+            trois: [],
             quatre: [
-                // { id: 4, groupe: ["ASR"], matiere: "VPN", prof: "Siaka", salle: "106" },
+                { id: 8, groupe: ["IG Gr1 - SR Gr1"], matiere: "Admin UNIX", prof: "Clément", salle: "012" },
+                { id: 9, groupe: ["IG Gr1/Gr2"], matiere: "Dev Mob", prof: "Venot", salle: "210" },
             ],
             cinq: [],
-            six: [
-                // { id: 4, groupe: ["ASR"], matiere: "VPN", prof: "Siaka", salle: "106" },
-                { id: 6, groupe: ["GB", "IG"], matiere: "C#", prof: "Ferdinand", salle: "210" },
-
-            ],
+            six: [],
+        },
+        jeudi: {
+            prem: [],
+            deux: [],
+            trois: [],
+            quatre: [],
+            cinq: [],
+            six: [],
         },
         vendredi: {
             prem: [],
             deux: [],
-            trois: [
-                { id: 6, groupe: ["GB", "IG"], matiere: "C#", prof: "Ferdinand", salle: "210" },
-            ],
+            trois: [],
             quatre: [],
-            cinq: [
-                { id: 4, groupe: ["ASR"], matiere: "VPN", prof: "Siaka", salle: "106" },
-                { id: 5, groupe: ["IG"], matiere: "Algo", prof: "Cyprien", salle: "012" },
-            ],
+            cinq: [],
             six: [],
         },
         samedi: {
             prem: [],
             deux: [],
             trois: [],
-            quatre: [
-                { id: 5, groupe: ["IG"], matiere: "Algo", prof: "Cyprien", salle: "012" },
-            ],
+            quatre: [],
             cinq: [],
-            six: [
-                { id: 6, groupe: ["GB", "IG"], matiere: "C#", prof: "Ferdinand", salle: "210" },
-                { id: 4, groupe: ["ASR"], matiere: "VPN", prof: "Siaka", salle: "106" },
-            ],
+            six: [],
         },
     }
 ]);
@@ -135,6 +113,9 @@ const joursSemaine = ["lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi
 const dateActuelle = ref(new Date());
 const debutSemaine = ref(null);
 const finSemaine = ref(null);
+
+const debutLisible = ref("-");
+const finLisible = ref("-");
 
 const niveau = ref("L1");
 
@@ -148,7 +129,12 @@ const ajouterDialog = ref(false);
 //
 //
 // MADE FONCTIONS -----------------------------------------------------------------------------------
-const formatterDate = (date) => {
+const dateLisible = (date) => {         /*   DD MMMM   */
+    const options = { year: "numeric", month: "long", day: "numeric" }
+    return date.toLocaleString('fr-FR', options);
+}
+
+const formatterDate = (date) => {       /*   YYYY-MM-DD  */
     const annee = date.getFullYear();
     const mois = (date.getMonth() + 1).toString().padStart(2, '0');
     const jour = date.getDate().toString().padStart(2, '0');
@@ -161,34 +147,42 @@ const prendreSemaine = (actualDate) => {
 
     debutSemaine.value = new Date(actualDate);
     debutSemaine.value.setDate(actualDate.getDate() - numeroJour.value + 1);
-    debutSemaine.value = formatterDate(debutSemaine.value);
 
     finSemaine.value = new Date(actualDate);
     finSemaine.value.setDate(actualDate.getDate() + (6 - numeroJour.value));
-    finSemaine.value = formatterDate(finSemaine.value);
-};
-
-const initDonnees = async () => {
-    const { edt } = await $fetch('/api/edt',
-    {
-        method: "POST",
-        body: {
-            niveau: niveau.value,
-            debutSemaine: debutSemaine.value,
-            finSemaine: finSemaine.value
-        }
-    });
 };
 
 // const fillTable = (data) => {
-//     tableItems.value[0].lundi.prem[0] = data
+//     tableItems.value[0].lundi.prem[0] = data.filter((lundi) => {
+//         const jour = new Date(lundi.Date);
+
+//         return ((jour.getDay() == 6) && lundi.Horaire == 3);
+//     });
+//     console.log(tableItems.value[0].lundi.prem[0]);
 // };
+
+const initDonnees = async () => {
+    const { edt } = await $fetch('/api/edt',
+        {
+            method: "POST",
+            body: {
+                niveau: niveau.value,
+                debutSemaine: formatterDate(debutSemaine.value),
+                finSemaine: formatterDate(finSemaine.value)
+            }
+        }
+    );
+    // fillTable(edt);
+};
 // MADE FONCTIONS -----------------------------------------------------------------------------------
 
-onMounted(async () => {
+onBeforeMount(() => {
     prendreSemaine(dateActuelle.value);
+    debutLisible.value = dateLisible(debutSemaine.value);
+    finLisible.value = dateLisible(finSemaine.value)
+})
+onMounted(async () => {
     await initDonnees();
-    // fillTable(edt);
 })
 
 </script>
@@ -196,11 +190,14 @@ onMounted(async () => {
 <template>
     <div>
         <v-row class="pb-2">
-            <v-col cols="12" md="4" offset-md="2" class="text-center text-button">
-                <h2>L1</h2>
+            <v-col cols="12" sm="4" md="5" lg="6" class="text-center text-overline text-md-button">
+                <h2>{{ niveau }}</h2>
             </v-col>
-            <v-col cols="12" md="4" class="text-center text-button">
-                <h2>15 Avril - 21 Avril</h2>
+            <v-col cols="12" sm="8" md="7" lg="6"
+                class="text-center text-overline text-md-button d-flex flex-column flex-sm-row align-center justify-center justify-sm-space-evenly">
+                <h2>{{ debutLisible }}</h2>
+                <h2>-</h2>
+                <h2>{{ finLisible }}</h2>
             </v-col>
         </v-row>
         <v-data-table sticky :headers="tableHeaders" :items="tableItems" class="border-t border-e border-b rounded mb-4"
@@ -219,7 +216,7 @@ onMounted(async () => {
 
             <template v-slot:item="{ item }">
                 <tr>
-                    <td class="border-s">
+                    <td class="border-s px-1">
                         <div class="d-flex flex-row align-center justify-center">
                             <v-sheet width="125px" class="text-center text-overline">
                                 {{ item.heures[0] }}
@@ -234,8 +231,9 @@ onMounted(async () => {
                                     <v-card class="elevation-0 rounded-0 cellule-hover" width="100%"
                                         @click="editerDialog = !editerDialog">
                                         <v-card-title
-                                            class="d-flex align-center justify-space-evenly font-weight-light">
-                                            <template v-if="horaire.groupe.length > 0" v-for="grp in horaire.groupe" :key="grp">
+                                            class="d-flex align-center justify-space-evenly text-body-1 font-weight-light">
+                                            <template v-if="horaire.groupe.length > 0" v-for="grp in horaire.groupe"
+                                                :key="grp">
                                                 <span>{{ grp }}</span>
                                             </template>
 
@@ -267,7 +265,7 @@ onMounted(async () => {
                     </template>
                 </tr>
                 <tr>
-                    <td class="border-s">
+                    <td class="border-s px-1">
                         <div class="d-flex flex-row align-center justify-center">
                             <v-sheet width="125px" class="text-center text-overline">
                                 {{ item.heures[1] }}
@@ -282,7 +280,7 @@ onMounted(async () => {
                                     <v-card class="elevation-0 rounded-0 cellule-hover" width="100%"
                                         @click="editerDialog = !editerDialog">
                                         <v-card-title
-                                            class="d-flex align-center justify-space-evenly font-weight-light">
+                                            class="d-flex align-center justify-space-evenly text-body-1 font-weight-light">
                                             <template v-for="grp in horaire.groupe" :key="grp">
                                                 <span>{{ grp }}</span>
                                             </template>
@@ -311,7 +309,7 @@ onMounted(async () => {
                     </template>
                 </tr>
                 <tr>
-                    <td class="border-s">
+                    <td class="border-s px-1">
                         <div class="d-flex flex-row align-center justify-center">
                             <v-sheet width="125px" class="text-center text-overline">
                                 {{ item.heures[2] }}
@@ -326,7 +324,7 @@ onMounted(async () => {
                                     <v-card class="elevation-0 rounded-0 cellule-hover" width="100%"
                                         @click="editerDialog = !editerDialog">
                                         <v-card-title
-                                            class="d-flex align-center justify-space-evenly font-weight-light">
+                                            class="d-flex align-center justify-space-evenly text-body-1 font-weight-light">
                                             <template v-for="grp in horaire.groupe" :key="grp">
                                                 <span>{{ grp }}</span>
                                             </template>
@@ -359,7 +357,7 @@ onMounted(async () => {
                 </tr>
 
                 <tr>
-                    <td class="border-s">
+                    <td class="border-s px-1">
                         <div class="d-flex flex-row align-center justify-center">
                             <v-sheet width="125px" class="text-center text-overline">
                                 {{ item.heures[3] }}
@@ -374,7 +372,7 @@ onMounted(async () => {
                                     <v-card class="elevation-0 rounded-0 cellule-hover" width="100%"
                                         @click="editerDialog = !editerDialog">
                                         <v-card-title
-                                            class="d-flex align-center justify-space-evenly font-weight-light">
+                                            class="d-flex align-center justify-space-evenly text-body-1 font-weight-light">
                                             <template v-for="grp in horaire.groupe" :key="grp">
                                                 <span>{{ grp }}</span>
                                             </template>
@@ -403,7 +401,7 @@ onMounted(async () => {
                     </template>
                 </tr>
                 <tr>
-                    <td class="border-s">
+                    <td class="border-s px-1">
                         <div class="d-flex flex-row align-center justify-center">
                             <v-sheet width="125px" class="text-center text-overline">
                                 {{ item.heures[4] }}
@@ -418,7 +416,7 @@ onMounted(async () => {
                                     <v-card class="elevation-0 rounded-0 cellule-hover" width="100%"
                                         @click="editerDialog = !editerDialog">
                                         <v-card-title
-                                            class="d-flex align-center justify-space-evenly font-weight-light">
+                                            class="d-flex align-center justify-space-evenly text-body-1 font-weight-light">
                                             <template v-for="grp in horaire.groupe" :key="grp">
                                                 <span>{{ grp }}</span>
                                             </template>
@@ -447,7 +445,7 @@ onMounted(async () => {
                     </template>
                 </tr>
                 <tr>
-                    <td class="border-s">
+                    <td class="border-s px-1">
                         <div class="d-flex flex-row align-center justify-center">
                             <v-sheet width="125px" class="text-center text-overline">
                                 {{ item.heures[5] }}
@@ -462,7 +460,7 @@ onMounted(async () => {
                                     <v-card class="elevation-0 rounded-0 cellule-hover" width="100%"
                                         @click="editerDialog = !editerDialog">
                                         <v-card-title
-                                            class="d-flex align-center justify-space-evenly font-weight-light">
+                                            class="d-flex align-center justify-space-evenly text-body-1 font-weight-light">
                                             <template v-for="grp in horaire.groupe" :key="grp">
                                                 <span>{{ grp }}</span>
                                             </template>
@@ -531,7 +529,7 @@ onMounted(async () => {
 <style>
 .empty-cell-width {
     width: 250px;
-    /* height: 124px; */
+    height: 124px;
 }
 
 .cellule-hover:hover {
