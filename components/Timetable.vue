@@ -64,7 +64,7 @@ const tableItems = ref([
             prem: [],
             deux: [],
             trois: [
-                { id: 6, groupe: ["GB Gr1 - IG"], matiere: "Admin BD", prof: "Guilante", salle: "004" },
+                { id: 6, groupe: ["GB Gr1", "IG"], matiere: "Admin BD", prof: "Guilante", salle: "004" },
                 { id: 7, groupe: ["IG Gr1/Gr2"], matiere: "Java", prof: "Volatiana", salle: "112" },
             ],
             quatre: [],
@@ -76,8 +76,8 @@ const tableItems = ref([
             deux: [],
             trois: [],
             quatre: [
-                { id: 8, groupe: ["IG Gr1 - SR Gr1"], matiere: "Admin UNIX", prof: "Clément", salle: "012" },
-                { id: 9, groupe: ["IG Gr1/Gr2"], matiere: "Dev Mob", prof: "Venot", salle: "210" },
+                { id: 8, groupe: ["IG Gr1", "SR Gr1"], matiere: "Admin UNIX", prof: "Clément", salle: "012" },
+                { id: 9, groupe: ["IG", "ASR"], matiere: "Dev Mob", prof: "Venot", salle: "210" },
             ],
             cinq: [],
             six: [],
@@ -88,7 +88,9 @@ const tableItems = ref([
             trois: [],
             quatre: [],
             cinq: [],
-            six: [],
+            six: [
+                { id: 10, groupe: ["IG Gr1", "SR Gr1"], matiere: "Admin UNIX", prof: "Clément", salle: "012" },
+            ],
         },
         vendredi: {
             prem: [],
@@ -231,14 +233,15 @@ onMounted(async () => {
                                     <v-card class="elevation-0 rounded-0 cellule-hover" width="100%"
                                         @click="editerDialog = !editerDialog">
                                         <v-card-title
-                                            class="d-flex align-center justify-space-evenly text-body-1 font-weight-light">
-                                            <template v-if="horaire.groupe.length > 0" v-for="grp in horaire.groupe"
-                                                :key="grp">
-                                                <span>{{ grp }}</span>
-                                            </template>
-
-                                            <template v-else>
-                                                <span>{{ horaire.niveau }}</span>
+                                            class="d-flex align-center justify-center text-body-1 font-weight-light">
+                                            <template v-for="(grp, index) in horaire.groupe" :key="index">
+                                                <template v-if="index == 0">
+                                                    <span>{{ grp }}</span>
+                                                </template>
+                                                <template v-else>
+                                                    <span>-</span>
+                                                    <span> {{ grp }}</span>
+                                                </template>
                                             </template>
                                         </v-card-title>
 
@@ -280,9 +283,15 @@ onMounted(async () => {
                                     <v-card class="elevation-0 rounded-0 cellule-hover" width="100%"
                                         @click="editerDialog = !editerDialog">
                                         <v-card-title
-                                            class="d-flex align-center justify-space-evenly text-body-1 font-weight-light">
-                                            <template v-for="grp in horaire.groupe" :key="grp">
-                                                <span>{{ grp }}</span>
+                                            class="d-flex align-center justify-center text-body-1 font-weight-light">
+                                            <template v-for="(grp, index) in horaire.groupe" :key="index">
+                                                <template v-if="index == 0">
+                                                    <span>{{ grp }}</span>
+                                                </template>
+                                                <template v-else>
+                                                    <span>-</span>
+                                                    <span> {{ grp }}</span>
+                                                </template>
                                             </template>
                                         </v-card-title>
 
@@ -324,9 +333,15 @@ onMounted(async () => {
                                     <v-card class="elevation-0 rounded-0 cellule-hover" width="100%"
                                         @click="editerDialog = !editerDialog">
                                         <v-card-title
-                                            class="d-flex align-center justify-space-evenly text-body-1 font-weight-light">
-                                            <template v-for="grp in horaire.groupe" :key="grp">
-                                                <span>{{ grp }}</span>
+                                            class="d-flex align-center justify-center text-body-1 font-weight-light">
+                                            <template v-for="(grp, index) in horaire.groupe" :key="index">
+                                                <template v-if="index == 0">
+                                                    <span>{{ grp }}</span>
+                                                </template>
+                                                <template v-else>
+                                                    <span>-</span>
+                                                    <span> {{ grp }}</span>
+                                                </template>
                                             </template>
                                         </v-card-title>
 
@@ -372,9 +387,15 @@ onMounted(async () => {
                                     <v-card class="elevation-0 rounded-0 cellule-hover" width="100%"
                                         @click="editerDialog = !editerDialog">
                                         <v-card-title
-                                            class="d-flex align-center justify-space-evenly text-body-1 font-weight-light">
-                                            <template v-for="grp in horaire.groupe" :key="grp">
-                                                <span>{{ grp }}</span>
+                                            class="d-flex align-center justify-center text-body-1 font-weight-light">
+                                            <template v-for="(grp, index) in horaire.groupe" :key="index">
+                                                <template v-if="index == 0">
+                                                    <span>{{ grp }}</span>
+                                                </template>
+                                                <template v-else>
+                                                    <span>-</span>
+                                                    <span> {{ grp }}</span>
+                                                </template>
                                             </template>
                                         </v-card-title>
 
@@ -416,9 +437,15 @@ onMounted(async () => {
                                     <v-card class="elevation-0 rounded-0 cellule-hover" width="100%"
                                         @click="editerDialog = !editerDialog">
                                         <v-card-title
-                                            class="d-flex align-center justify-space-evenly text-body-1 font-weight-light">
-                                            <template v-for="grp in horaire.groupe" :key="grp">
-                                                <span>{{ grp }}</span>
+                                            class="d-flex align-center justify-center text-body-1 font-weight-light">
+                                            <template v-for="(grp, index) in horaire.groupe" :key="index">
+                                                <template v-if="index == 0">
+                                                    <span>{{ grp }}</span>
+                                                </template>
+                                                <template v-else>
+                                                    <span>-</span>
+                                                    <span> {{ grp }}</span>
+                                                </template>
                                             </template>
                                         </v-card-title>
 
@@ -460,9 +487,15 @@ onMounted(async () => {
                                     <v-card class="elevation-0 rounded-0 cellule-hover" width="100%"
                                         @click="editerDialog = !editerDialog">
                                         <v-card-title
-                                            class="d-flex align-center justify-space-evenly text-body-1 font-weight-light">
-                                            <template v-for="grp in horaire.groupe" :key="grp">
-                                                <span>{{ grp }}</span>
+                                            class="d-flex align-center justify-center text-body-1 font-weight-light">
+                                            <template v-for="(grp, index) in horaire.groupe" :key="index">
+                                                <template v-if="index == 0">
+                                                    <span>{{ grp }}</span>
+                                                </template>
+                                                <template v-else>
+                                                    <span>-</span>
+                                                    <span> {{ grp }}</span>
+                                                </template>
                                             </template>
                                         </v-card-title>
 
