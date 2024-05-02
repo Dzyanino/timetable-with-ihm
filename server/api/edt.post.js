@@ -5,10 +5,11 @@ export default eventHandler(async (event) => {
     const body = await readBody(event);
 
     const { data } = await supabase.from('edt_view')
-    .select('*')
-    .eq('CodeNiveau', body.niveau)
-    .gte('Date', body.debutSemaine)
-    .lte('Date', body.finSemaine);
+        .select('*')
+        .eq('CodeNiveau', body.niveau)
+        .gte('Date', body.debutSemaine)
+        .lte('Date', body.finSemaine);
+
 
     return { edt: data };
-})
+});

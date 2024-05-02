@@ -1,5 +1,4 @@
 <script setup>
-
 // CONSTANTES ----------------------------------------------------------------------------------
 const tableHeaders = ref([
     {
@@ -54,11 +53,11 @@ const tableItems = ref([
                 { id: 4, groupe: ["ASR"], matiere: "VPN", prof: "Siaka", salle: "106" },
                 { id: 5, groupe: ["IG"], matiere: "C++", prof: "Cyprien", salle: "001" },
             ],
-            deux: [{ id: 5, groupe: ["IG"], matiere: "C++", prof: "Cyprien", salle: "001" },],
-            trois: [{ id: 5, groupe: ["IG"], matiere: "C++", prof: "Cyprien", salle: "001" },],
-            quatre: [{ id: 5, groupe: ["IG"], matiere: "C++", prof: "Cyprien", salle: "001" },],
-            cinq: [{ id: 5, groupe: ["IG"], matiere: "C++", prof: "Cyprien", salle: "001" },],
-            six: [{ id: 5, groupe: ["IG"], matiere: "C++", prof: "Cyprien", salle: "001" },],
+            deux: [],
+            trois: [],
+            quatre: [],
+            cinq: [],
+            six: [],
         },
         mardi: {
             prem: [],
@@ -112,7 +111,7 @@ const tableItems = ref([
 ]);
 
 const joursSemaine = ["lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi"];
-const dateActuelle = ref(new Date());
+const dateActuelle = ref(new Date('2024-04-25'));
 const debutSemaine = ref(null);
 const finSemaine = ref(null);
 
@@ -130,11 +129,21 @@ const ajouterDialog = ref(false);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 // MADE FONCTIONS -----------------------------------------------------------------------------------
 const dateLisible = (date) => {         /*   DD MMMM   */
     const options = { year: "numeric", month: "long", day: "numeric" }
     return date.toLocaleString('fr-FR', options);
-}
+};
 
 const formatterDate = (date) => {       /*   YYYY-MM-DD  */
     const annee = date.getFullYear();
@@ -154,14 +163,44 @@ const prendreSemaine = (actualDate) => {
     finSemaine.value.setDate(actualDate.getDate() + (6 - numeroJour.value));
 };
 
-// const fillTable = (data) => {
-//     tableItems.value[0].lundi.prem[0] = data.filter((lundi) => {
-//         const jour = new Date(lundi.Date);
+const fusionnerSimilaire = (data) => {
+    const dataFusionnee = data.reduce((accumulee, actuelle) => {
+        const key = `${actuelle.Date}-${actuelle.Horaire}-${actuelle.NumeroSalle}-${actuelle.IdEnseignant}-${actuelle.CodeElement}`;
+        const donneesExistantes = accumulee[key];
 
-//         return ((jour.getDay() == 6) && lundi.Horaire == 3);
-//     });
-//     console.log(tableItems.value[0].lundi.prem[0]);
-// };
+        if (!donneesExistantes) {
+            accumulee[key] = {
+                ...actuelle,
+                Classe: [actuelle.CodeNiveau + " " + actuelle.CodeGroupe],
+            };
+        } else if (actuelle.CodeParcours === donneesExistantes.CodeParcours) {
+            donneesExistantes.Classe[donneesExistantes.Classe.length - 1] =
+                donneesExistantes.Classe[donneesExistantes.Classe.length - 1] +
+                "/" +
+                actuelle.CodeGroupe;
+        } else {
+            accumulee[key] = {
+                ...actuelle,
+                Classe: [actuelle.CodeNiveau + " " + actuelle.CodeGroupe],
+            };
+        }
+
+        return accumulee;
+    }, {});
+
+    return dataFusionnee;
+}
+
+const transformerDonnees = (data) => {
+    const matin = data.filter(edt => edt.Horaire < 4);
+    const aprem = data.filter(edt => edt.Horaire >= 4);
+
+    const matinFusionne = Object.values(fusionnerSimilaire(matin));
+    const apremFusionne = Object.values(fusionnerSimilaire(aprem));
+
+    console.log(matinFusionne);
+    console.log(apremFusionne);
+};
 
 const initDonnees = async () => {
     const { edt } = await $fetch('/api/edt',
@@ -174,7 +213,7 @@ const initDonnees = async () => {
             }
         }
     );
-    // fillTable(edt);
+    transformerDonnees(edt);
 };
 // MADE FONCTIONS -----------------------------------------------------------------------------------
 
