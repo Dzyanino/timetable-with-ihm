@@ -300,17 +300,19 @@ onBeforeMount(async () => {
         <v-btn variant="text" icon="mdi-chevron-right" @click="changerNiveau('plus')" />
       </v-col>
 
-      <v-col cols="12" sm="7" class="d-flex flex-row align-center justify-space-around">
-        <v-btn variant="text" icon="mdi-chevron-left" @click="changerSemaine('moins')" />
-        <div
-          class="text-center text-overline text-md-button d-flex flex-column flex-sm-row align-center justify-space-evenly">
-          <h2>{{ debutLisible }}<span v-if="debutSemaine.getFullYear() != finSemaine.getFullYear()">{{ " " +
+      <ClientOnly>
+        <v-col cols="12" sm="7" class="d-flex flex-row align-center justify-space-around">
+          <v-btn variant="text" icon="mdi-chevron-left" @click="changerSemaine('moins')" />
+          <div
+            class="text-center text-overline text-md-button d-flex flex-column flex-sm-row align-center justify-space-evenly">
+            <h2>{{ debutLisible }}<span v-if="debutSemaine.getFullYear() != finSemaine.getFullYear()">{{ " " +
           debutSemaine.getFullYear() }}</span></h2>
-          <h2>-</h2>
-          <h2>{{ finLisible }}<span>{{ " " + finSemaine.getFullYear() }}</span></h2>
-        </div>
-        <v-btn variant="text" icon="mdi-chevron-right" @click="changerSemaine('plus')" />
-      </v-col>
+            <h2>-</h2>
+            <h2>{{ finLisible }}<span>{{ " " + finSemaine.getFullYear() }}</span></h2>
+          </div>
+          <v-btn variant="text" icon="mdi-chevron-right" @click="changerSemaine('plus')" />
+        </v-col>
+      </ClientOnly>
 
       <v-col cols="12" sm="2">
         <v-btn color="success">Ajouter</v-btn>
@@ -353,36 +355,36 @@ onBeforeMount(async () => {
               <template v-for="jour in joursSemaine" :key="jour">
                 <td class="border-s bg-grey-lighten-5 pa-0">
                   <div class="d-flex flex-row align-center justify-space-evenly empty-cell-width">
-                    <!-- <template v-if="item.jours[jour][index + 1].length > 0"> -->
-                    <template v-if="item.jours[jour][index + 1][0].length > 0">
-                      <template v-for="horaire in item.jours[jour][index + 1][0]" :key="horaire.NumeroEdt">
-                        <v-card hover flat class="flex-grow-1 rounded-0" @click="editerDialog = !editerDialog">
-                          <v-card-title class="d-flex align-center justify-center text-body-1 font-weight-light">
-                            <template v-for="(classe, occ) in horaire.Classe" :key="occ">
-                              <template v-if="occ == 0">
-                                <span>{{ classe }}</span>
+                    <ClientOnly>
+                      <template v-if="item.jours[jour][index + 1][0].length > 0">
+                        <template v-for="horaire in item.jours[jour][index + 1][0]" :key="horaire.NumeroEdt">
+                          <v-card hover flat class="flex-grow-1 rounded-0" @click="editerDialog = !editerDialog">
+                            <v-card-title class="d-flex align-center justify-center text-body-1 font-weight-light">
+                              <template v-for="(classe, occ) in horaire.Classe" :key="occ">
+                                <template v-if="occ == 0">
+                                  <span>{{ classe }}</span>
+                                </template>
+                                <template v-else>
+                                  <span>-</span>
+                                  <span>{{ classe }}</span>
+                                </template>
                               </template>
-                              <template v-else>
-                                <span>-</span>
-                                <span>{{ classe }}</span>
-                              </template>
-                            </template>
-                          </v-card-title>
+                            </v-card-title>
 
-                          <v-card-text class="d-flex flex-column align-center justify-center text-wrap">
-                            <span class="text-center text-uppercase font-weight-bold">
-                              {{ horaire.appelationelement }}
-                            </span>
-                            <span>{{ horaire.appelationenseignant }}</span>
-                            <span>{{ horaire.NumeroSalle }}</span>
-                          </v-card-text>
-                        </v-card>
+                            <v-card-text class="d-flex flex-column align-center justify-center text-wrap">
+                              <span class="text-center text-uppercase font-weight-bold">
+                                {{ horaire.appelationelement }}
+                              </span>
+                              <span>{{ horaire.appelationenseignant }}</span>
+                              <span>{{ horaire.NumeroSalle }}</span>
+                            </v-card-text>
+                          </v-card>
+                        </template>
                       </template>
-                    </template>
-                    <template v-else>
-                      <div class="empty-cell-width"></div>
-                    </template>
-                    <!-- </template> -->
+                      <template v-else>
+                        <div class="empty-cell-width"></div>
+                      </template>
+                    </ClientOnly>
                   </div>
                 </td>
               </template>
