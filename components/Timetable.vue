@@ -304,11 +304,12 @@ onBeforeMount(async () => {
 
               <template v-for="jour in joursSemaine" :key="jour">
                 <td class="border-s bg-grey-lighten-5 pa-0">
-                  <div class="bg-red d-flex flex-row align-center justify-center empty-cell-width">
+                  <div class="d-flex flex-row align-center justify-space-evenly empty-cell-width">
                     <template v-if="item.jours[jour][index + 1].length > 0">
                       <template v-if="item.jours[jour][index + 1][0].length > 0">
                         <template v-for="horaire in item.jours[jour][index + 1][0]" :key="horaire.NumeroEdt">
-                          <v-card class="elevation-0 rounded-0 cellule-hover w-100" @click="editerDialog = !editerDialog">
+                          <v-card hover flat class="flex-grow-1 rounded-0"
+                            @click="editerDialog = !editerDialog">
                             <v-card-title class="d-flex align-center justify-center text-body-1 font-weight-light">
                               <template v-for="(classe, occ) in horaire.Classe" :key="occ">
                                 <template v-if="occ == 0">
@@ -386,9 +387,9 @@ onBeforeMount(async () => {
   /* height: 124px; */
 }
 
-.cellule-hover:hover {
+/* .cellule-hover:hover {
   background-color: #f0f0f0;
-}
+} */
 
 
 /* .test {
