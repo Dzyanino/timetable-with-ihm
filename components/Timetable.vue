@@ -116,7 +116,7 @@ const finSemaine = ref(null);
 const debutLisible = ref("-");
 const finLisible = ref("-");
 
-const niveau = ref("L2");
+const niveau = ref("L1");
 
 const editerDialog = ref(false);
 const ajouterDialog = ref(false);
@@ -154,6 +154,7 @@ const formatterDate = (date) => {
 };
 
 const prendreSemaine = (actualDate) => {
+  /* XX XXXX - XX XXXX */
   const numeroJour = ref(actualDate.getDay());
 
   debutSemaine.value = new Date(actualDate);
@@ -164,21 +165,22 @@ const prendreSemaine = (actualDate) => {
 };
 
 const fusionnerSimilaire = (data) => {
+  /* Meme cours, classes differentes */
   const dataFusionnee = data.reduce((accumulee, actuelle) => {
     const key = `${actuelle.Date}-${actuelle.Horaire}-${actuelle.NumeroSalle}-${actuelle.IdEnseignant}-${actuelle.CodeElement}`;
     const donneesExistantes = accumulee[key];
 
     if (!donneesExistantes) {
       accumulee[key] = {
-        NumeroEdt: [actuelle.NumeroEdt],
+        AllNumeroEdt: [actuelle.NumeroEdt],
         ...actuelle,
         Classe: [
-          actuelle.appelationparcours +
+          (actuelle.appelationparcours == null ? "" : actuelle.appelationparcours) +
             (actuelle.CodeGroupe == null ? "" : " " + actuelle.CodeGroupe),
         ],
       };
     } else if (actuelle.CodeParcours === donneesExistantes.CodeParcours) {
-      donneesExistantes.NumeroEdt = [
+      donneesExistantes.AllNumeroEdt = [
         donneesExistantes.NumeroEdt,
         actuelle.NumeroEdt,
       ];
@@ -188,14 +190,14 @@ const fusionnerSimilaire = (data) => {
         actuelle.CodeGroupe;
     } else {
       accumulee[key] = {
-        NumeroEdt: [donneesExistantes.NumeroEdt, actuelle.NumeroEdt],
+        AllNumeroEdt: [donneesExistantes.NumeroEdt, actuelle.NumeroEdt],
         ...actuelle,
         Classe: [
-          donneesExistantes.appelationparcours +
+        (donneesExistantes.appelationparcours == null ? "" : donneesExistantes.appelationparcours) +
             (donneesExistantes.CodeGroupe == null
               ? ""
               : " " + donneesExistantes.CodeGroupe),
-          actuelle.appelationparcours +
+              (actuelle.appelationparcours == null ? "" : actuelle.appelationparcours) +
             (actuelle.CodeGroupe == null ? "" : " " + actuelle.CodeGroupe),
         ],
       };
@@ -207,15 +209,39 @@ const fusionnerSimilaire = (data) => {
   return dataFusionnee;
 };
 
+const remplirTableItems = (data) => {
+  let i = 0;
+  for (const jours in tableItems.value[0].jours) {
+    if (Object.hasOwnProperty.call(tableItems.value[0].jours, jours)) {
+      const jour = tableItems.value[0].jours[jours];
+      let j = 0;
+
+      for (const horaires in jour) {
+        if (Object.hasOwnProperty.call(jour, horaires)) {
+          const creneau = jour[horaires];
+          const edt = data.filter((ele) => {
+            const day = new Date(ele.Date).getDay();
+            console.log(ele.Date);
+          });
+          // console.log(edt);
+          j++;
+        }
+      }
+      // console.log(i);
+      i++;
+    }
+  }
+};
+
 const transformerDonnees = (data) => {
-  const matin = data.filter((edt) => edt.Horaire < 4);
-  const aprem = data.filter((edt) => edt.Horaire >= 4);
+  // const matin = data.filter((edt) => edt.Horaire < 4);
+  // const aprem = data.filter((edt) => edt.Horaire >= 4);
 
-  const matinFusionne = Object.values(fusionnerSimilaire(matin));
-  const apremFusionne = Object.values(fusionnerSimilaire(aprem));
+  const matinFusionne = Object.values(fusionnerSimilaire(data));
+  // const apremFusionne = Object.values(fusionnerSimilaire(aprem));
 
+  // remplirTableItems(matinFusionne);
   console.log(matinFusionne);
-  console.log(apremFusionne);
 };
 
 const initDonnees = async () => {
