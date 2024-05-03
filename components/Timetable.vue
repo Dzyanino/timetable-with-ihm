@@ -109,17 +109,20 @@ const joursSemaine = [
   "vendredi",
   "samedi",
 ];
-const dateActuelle = ref(new Date("2024-04-25"));
+const dateActuelle = ref(new Date());
 const debutSemaine = ref(null);
 const finSemaine = ref(null);
 
 const debutLisible = ref("-");
 const finLisible = ref("-");
 
-const niveau = ref("L2");
+const niveaux = ["L1", "L2", "L3", "M1", "M2"];
+let indexNiveau = 0;
+const niveau = ref(niveaux[indexNiveau]);
 
 const editerDialog = ref(false);
 const ajouterDialog = ref(false);
+const tableLoading = ref(false);
 // CONSTANTES ----------------------------------------------------------------------------------
 
 
@@ -132,7 +135,6 @@ const dateLisible = (date) => {
   const options = { year: "numeric", month: "long", day: "numeric" };
   return date.toLocaleString("fr-FR", options);
 };
-
 const formatterDate = (date) => {
   /*   YYYY-MM-DD  */
   const annee = date.getFullYear();
@@ -141,7 +143,6 @@ const formatterDate = (date) => {
 
   return annee + "-" + mois + "-" + jour;
 };
-
 const prendreSemaine = (actualDate) => {
   /* XX XXXX - XX XXXX */
   const numeroJour = ref(actualDate.getDay());
@@ -152,6 +153,8 @@ const prendreSemaine = (actualDate) => {
   finSemaine.value = new Date(actualDate);
   finSemaine.value.setDate(actualDate.getDate() + (6 - numeroJour.value));
 };
+
+
 
 const fusionnerSimilaire = async (data) => {
   /* Meme cours, classes differentes */
@@ -192,12 +195,10 @@ const fusionnerSimilaire = async (data) => {
 
   return dataFusionnee;
 };
-
 const transformerDonnees = async (data) => {
-  const edtFusionne = Object.values(await fusionnerSimilaire(data));
-  return edtFusionne;
+  const edtTransformee = Object.values(await fusionnerSimilaire(data));
+  return edtTransformee;
 };
-
 const remplirTableItems = async (data) => {
   let i = 0;
   for (const jours in tableItems.value[0].jours) {
@@ -208,6 +209,7 @@ const remplirTableItems = async (data) => {
       for (const horaires in jour) {
         if (Object.hasOwnProperty.call(jour, horaires)) {
           const creneau = jour[horaires];
+          creneau.length = 0;
           const edt = data.filter((ele) => {
             const day = new Date(ele.Date).getDay();
             return day == i + 1 && ele.Horaire == j + 1;
@@ -221,8 +223,8 @@ const remplirTableItems = async (data) => {
   }
   // console.log(tableItems.value[0].jours);
 };
-
 const initDonnees = async () => {
+  tableLoading.value = true;
   const { edt } = await $fetch("/api/edt", {
     method: "POST",
     body: {
@@ -231,7 +233,38 @@ const initDonnees = async () => {
       finSemaine: formatterDate(finSemaine.value),
     },
   });
-  await remplirTableItems(await transformerDonnees(edt));
+  setTimeout(async () => {
+    await remplirTableItems(await transformerDonnees(edt))
+    tableLoading.value = false;
+  }, 750)
+};
+
+
+const changerNiveau = async (sens) => {
+  if (sens == "plus") {
+    (indexNiveau >= 4) ? indexNiveau = 0 : indexNiveau++;
+    niveau.value = niveaux[indexNiveau];
+  }
+  else if (sens == "moins") {
+    (indexNiveau <= 0) ? indexNiveau = 4 : indexNiveau--;
+    niveau.value = niveaux[indexNiveau];
+  }
+
+  await initDonnees();
+};
+const changerSemaine = async (sens) => {
+  if (sens == "plus") {
+    dateActuelle.value.setDate(dateActuelle.value.getDate() + 7);
+  }
+  else if (sens == "moins") {
+    dateActuelle.value.setDate(dateActuelle.value.getDate() - 7);
+  }
+
+  prendreSemaine(dateActuelle.value);
+  debutLisible.value = dateLisible(debutSemaine.value);
+  finLisible.value = dateLisible(finSemaine.value);
+
+  await initDonnees();
 };
 // MADE FONCTIONS -----------------------------------------------------------------------------------
 
@@ -239,44 +272,48 @@ const initDonnees = async () => {
 
 
 // BUILT-IN FUNCTION -----------------------------------------------------------------------------------
-onBeforeMount(async () => {
+// onBeforeMount(async () => {
+// });
+onMounted(async () => {
   prendreSemaine(dateActuelle.value);
   debutLisible.value = dateLisible(debutSemaine.value);
   finLisible.value = dateLisible(finSemaine.value);
   await initDonnees();
 });
-// onMounted(() => {
-// });
 // BUILT-IN FUNCTION -----------------------------------------------------------------------------------
 </script>
 
 <template>
   <div>
     <v-row class="bg-white border rounded-lg mx-auto">
+
       <v-col cols="12" sm="3"
         class="text-center text-overline text-md-button d-flex flex-row align-center justify-space-evenly">
-        <v-btn variant="tonal" color="success" icon="mdi-chevron-left" />
+        <v-btn variant="tonal" icon="mdi-chevron-left" @click="changerNiveau('moins')" />
         <h2>{{ niveau }}</h2>
-        <v-btn variant="tonal" color="success" icon="mdi-chevron-right" />
+        <v-btn variant="tonal" icon="mdi-chevron-right" @click="changerNiveau('plus')" />
       </v-col>
+
       <v-col cols="12" sm="7" class="d-flex flex-row align-center justify-space-evenly">
-        <v-btn variant="tonal" color="success" icon="mdi-chevron-left" />
+        <v-btn variant="tonal" icon="mdi-chevron-left" @click="changerSemaine('moins')" />
         <div
           class="text-center text-overline text-md-button d-flex flex-column flex-sm-row align-center justify-space-evenly">
           <h2>{{ debutLisible }}</h2>
           <h2>-</h2>
           <h2>{{ finLisible }}</h2>
         </div>
-        <v-btn variant="tonal" color="success" icon="mdi-chevron-right" />
+        <v-btn variant="tonal" icon="mdi-chevron-right" @click="changerSemaine('plus')" />
       </v-col>
+
       <v-col cols="12" sm="2">
         <v-btn color="success">Ajouter</v-btn>
       </v-col>
+
     </v-row>
     <v-row>
       <v-col cols="12">
-        <v-data-table sticky :headers="tableHeaders" :items="tableItems" class="border-t border-e border-b rounded mb-4"
-          color="green">
+        <v-data-table :loading="tableLoading" loading-text="aksdjfjaklsdjf" :headers="tableHeaders" :items="tableItems"
+          class="border-t border-e border-b rounded mb-4" color="green">
 
           <template v-slot:headers="{ columns }">
             <tr>
@@ -308,8 +345,7 @@ onBeforeMount(async () => {
                     <template v-if="item.jours[jour][index + 1].length > 0">
                       <template v-if="item.jours[jour][index + 1][0].length > 0">
                         <template v-for="horaire in item.jours[jour][index + 1][0]" :key="horaire.NumeroEdt">
-                          <v-card hover flat class="flex-grow-1 rounded-0"
-                            @click="editerDialog = !editerDialog">
+                          <v-card hover flat class="flex-grow-1 rounded-0" @click="editerDialog = !editerDialog">
                             <v-card-title class="d-flex align-center justify-center text-body-1 font-weight-light">
                               <template v-for="(classe, occ) in horaire.Classe" :key="occ">
                                 <template v-if="occ == 0">
@@ -342,7 +378,6 @@ onBeforeMount(async () => {
 
             </tr>
           </template>
-
           <template v-slot:bottom></template>
         </v-data-table>
       </v-col>
@@ -384,17 +419,13 @@ onBeforeMount(async () => {
 <style>
 .empty-cell-width {
   min-width: 250px !important;
-  /* height: 124px; */
+  min-height: 124px;
 }
 
 /* .cellule-hover:hover {
   background-color: #f0f0f0;
 } */
 
-
-/* .test {
-  overflow-y: auto;
-} */
 /* 
 <v-card class="elevation-0 rounded-0 empty-cell-width bg-transparent">
     <v-card-text class="text-center">
