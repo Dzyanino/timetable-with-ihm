@@ -175,7 +175,7 @@ const fusionnerSimilaire = (data) => {
         AllNumeroEdt: [actuelle.NumeroEdt],
         ...actuelle,
         Classe: [
-          (actuelle.appelationparcours || "") + ((actuelle.CodeGroupe != null) ? " " : "") + (actuelle.CodeGroupe || ""),
+          (actuelle.appelationparcours || "") + ((!!actuelle.appelationparcours && !!actuelle.CodeGroupe) ? " " : "") + (actuelle.CodeGroupe || ""),
         ],
       };
     } else if (actuelle.CodeParcours === donneesExistantes.CodeParcours) {
@@ -192,8 +192,8 @@ const fusionnerSimilaire = (data) => {
         AllNumeroEdt: [donneesExistantes.NumeroEdt, actuelle.NumeroEdt],
         ...actuelle,
         Classe: [
-          (donneesExistantes.appelationparcours || "") + ((donneesExistantes.CodeGroupe != null) ? " " : "") + (donneesExistantes.CodeGroupe || ""),
-          (actuelle.appelationparcours || "") + ((actuelle.CodeGroupe != null) ? " " : "") + (actuelle.CodeGroupe || ""),
+          (donneesExistantes.appelationparcours || "") + ((!!donneesExistantes.appelationparcours && !!donneesExistantes.CodeGroupe) ? " " : "") + (donneesExistantes.CodeGroupe || ""),
+          (actuelle.appelationparcours || "") + ((!!actuelle.appelationparcours && !!actuelle.CodeGroupe) ? " " : "") + (actuelle.CodeGroupe || ""),
         ],
       };
     }
@@ -230,7 +230,7 @@ const remplirTableItems = (data) => {
       i++;
     }
   }
-  console.log(tableItems.value[0].jours);
+  // console.log(tableItems.value[0].jours);
 };
 
 const initDonnees = async () => {
@@ -304,30 +304,30 @@ onMounted(async () => {
               <template v-for="jour in joursSemaine" :key="jour">
                 <td class="border-s bg-grey-lighten-5 px-0">
                   <div class="d-flex flex-row align-center justify-center w-100">
-                    <template v-if="item.jours[jour][index + 1].length > 0"
-                      v-for="horaire in item.jours[jour][index + 1]" :key="horaire.NumeroEdt">
-                      <v-card class="elevation-0 rounded-0 cellule-hover" width="100%"
-                        @click="editerDialog = !editerDialog">
-                        <v-card-title class="d-flex align-center justify-center text-body-1 font-weight-light">
-                          <template v-for="grp in horaire.AllNumeroEdt" :key="grp">
-                            <template>
-                              <span>{{ grp }}</span>
+                    <template v-if="item.jours[jour][index + 1].length > 0">
+                      <template v-for="horaire in item.jours[jour][index + 1][0]" :key="horaire.NumeroEdt">
+                        <v-card class="elevation-0 rounded-0 cellule-hover" width="100%"
+                          @click="editerDialog = !editerDialog">
+                          <v-card-title class="d-flex align-center justify-center text-body-1 font-weight-light">
+                            <template v-for="(classe, occ) in horaire.Classe" :key="occ">
+                              <template v-if="occ == 0">
+                                <span>{{ classe }}</span>
+                              </template>
+                              <template v-else>
+                                <span>-</span>
+                                <span>{{ classe }}</span>
+                              </template>
                             </template>
-                            <!-- <template v-else>
-                              <span>-</span>
-                              <span>
-                                {{ grp }}</span>
-                            </template> -->
-                          </template>
-                        </v-card-title>
+                          </v-card-title>
 
-                        <v-card-text class="d-flex flex-column align-center justify-center">
-                          <span class="text-center text-uppercase font-weight-bold">{{ horaire.appelationelement
-                            }}</span>
-                          <span>{{ horaire.appelationenseignant }}</span>
-                          <span>{{ horaire.NumeroSalle }}</span>
-                        </v-card-text>
-                      </v-card>
+                          <v-card-text class="d-flex flex-column align-center justify-center">
+                            <span class="text-center text-uppercase font-weight-bold">{{ horaire.appelationelement
+                              }}</span>
+                            <span>{{ horaire.appelationenseignant }}</span>
+                            <span>{{ horaire.NumeroSalle }}</span>
+                          </v-card-text>
+                        </v-card>
+                      </template>
                     </template>
                     <template v-else>
                       <div class="empty-cell-width"></div>
