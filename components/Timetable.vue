@@ -2,6 +2,12 @@
 // CONSTANTES ----------------------------------------------------------------------------------
 const tableHeaders = ref([
   {
+    title: "#",
+    key: "#",
+    sortable: false,
+    minWidth: "75px",
+  },
+  {
     title: "Lundi",
     key: "lun",
     sortable: false,
@@ -132,7 +138,7 @@ const tableLoading = ref(false);
 // MADE FONCTIONS -----------------------------------------------------------------------------------
 const dateLisible = (date) => {
   /*   DD MMMM   */
-  const options = { year: "numeric", month: "long", day: "numeric" };
+  const options = { month: "long", day: "numeric" };//year: "numeric", 
   return date.toLocaleString("fr-FR", options);
 };
 const formatterDate = (date) => {
@@ -272,14 +278,14 @@ const changerSemaine = async (sens) => {
 
 
 // BUILT-IN FUNCTION -----------------------------------------------------------------------------------
-// onBeforeMount(async () => {
-// });
-onMounted(async () => {
+onBeforeMount(async () => {
   prendreSemaine(dateActuelle.value);
   debutLisible.value = dateLisible(debutSemaine.value);
   finLisible.value = dateLisible(finSemaine.value);
   await initDonnees();
 });
+// onMounted(async () => {
+// });
 // BUILT-IN FUNCTION -----------------------------------------------------------------------------------
 </script>
 
@@ -288,21 +294,22 @@ onMounted(async () => {
     <v-row class="bg-white border rounded-lg mx-auto">
 
       <v-col cols="12" sm="3"
-        class="text-center text-overline text-md-button d-flex flex-row align-center justify-space-evenly">
-        <v-btn variant="tonal" icon="mdi-chevron-left" @click="changerNiveau('moins')" />
+        class="text-center text-overline text-md-button d-flex flex-row align-center justify-space-around">
+        <v-btn variant="text" icon="mdi-chevron-left" @click="changerNiveau('moins')" />
         <h2>{{ niveau }}</h2>
-        <v-btn variant="tonal" icon="mdi-chevron-right" @click="changerNiveau('plus')" />
+        <v-btn variant="text" icon="mdi-chevron-right" @click="changerNiveau('plus')" />
       </v-col>
 
-      <v-col cols="12" sm="7" class="d-flex flex-row align-center justify-space-evenly">
-        <v-btn variant="tonal" icon="mdi-chevron-left" @click="changerSemaine('moins')" />
+      <v-col cols="12" sm="7" class="d-flex flex-row align-center justify-space-around">
+        <v-btn variant="text" icon="mdi-chevron-left" @click="changerSemaine('moins')" />
         <div
           class="text-center text-overline text-md-button d-flex flex-column flex-sm-row align-center justify-space-evenly">
-          <h2>{{ debutLisible }}</h2>
+          <h2>{{ debutLisible }}<span v-if="debutSemaine.getFullYear() != finSemaine.getFullYear()">{{ " " +
+          debutSemaine.getFullYear() }}</span></h2>
           <h2>-</h2>
-          <h2>{{ finLisible }}</h2>
+          <h2>{{ finLisible }}<span>{{ " " + finSemaine.getFullYear() }}</span></h2>
         </div>
-        <v-btn variant="tonal" icon="mdi-chevron-right" @click="changerSemaine('plus')" />
+        <v-btn variant="text" icon="mdi-chevron-right" @click="changerSemaine('plus')" />
       </v-col>
 
       <v-col cols="12" sm="2">
@@ -317,13 +324,17 @@ onMounted(async () => {
 
           <template v-slot:headers="{ columns }">
             <tr>
-              <td class="border-s border-b text-center text-overline" width="75px">
-                #
-              </td>
-              <template v-for="column in columns" :key="column.key">
-                <td class="border-s border-b text-center text-overline" width="250px">
-                  <span>{{ column.title }}</span>
-                </td>
+              <template v-for="(column, numero) in columns" :key="column.key">
+                <template v-if="numero == 0">
+                  <td class="border-s border-b text-center text-overline" width="75px">
+                    {{ column.title }}
+                  </td>
+                </template>
+                <template v-else>
+                  <td class="border-s border-b text-center text-overline" width="250px">
+                    <span>{{ column.title }}</span>
+                  </td>
+                </template>
               </template>
             </tr>
           </template>
@@ -342,49 +353,58 @@ onMounted(async () => {
               <template v-for="jour in joursSemaine" :key="jour">
                 <td class="border-s bg-grey-lighten-5 pa-0">
                   <div class="d-flex flex-row align-center justify-space-evenly empty-cell-width">
-                    <template v-if="item.jours[jour][index + 1].length > 0">
-                      <template v-if="item.jours[jour][index + 1][0].length > 0">
-                        <template v-for="horaire in item.jours[jour][index + 1][0]" :key="horaire.NumeroEdt">
-                          <v-card hover flat class="flex-grow-1 rounded-0" @click="editerDialog = !editerDialog">
-                            <v-card-title class="d-flex align-center justify-center text-body-1 font-weight-light">
-                              <template v-for="(classe, occ) in horaire.Classe" :key="occ">
-                                <template v-if="occ == 0">
-                                  <span>{{ classe }}</span>
-                                </template>
-                                <template v-else>
-                                  <span>-</span>
-                                  <span>{{ classe }}</span>
-                                </template>
+                    <!-- <template v-if="item.jours[jour][index + 1].length > 0"> -->
+                    <template v-if="item.jours[jour][index + 1][0].length > 0">
+                      <template v-for="horaire in item.jours[jour][index + 1][0]" :key="horaire.NumeroEdt">
+                        <v-card hover flat class="flex-grow-1 rounded-0" @click="editerDialog = !editerDialog">
+                          <v-card-title class="d-flex align-center justify-center text-body-1 font-weight-light">
+                            <template v-for="(classe, occ) in horaire.Classe" :key="occ">
+                              <template v-if="occ == 0">
+                                <span>{{ classe }}</span>
                               </template>
-                            </v-card-title>
+                              <template v-else>
+                                <span>-</span>
+                                <span>{{ classe }}</span>
+                              </template>
+                            </template>
+                          </v-card-title>
 
-                            <v-card-text class="d-flex flex-column align-center justify-center text-wrap">
-                              <span class="text-center text-uppercase font-weight-bold">
-                                {{ horaire.appelationelement }}
-                              </span>
-                              <span>{{ horaire.appelationenseignant }}</span>
-                              <span>{{ horaire.NumeroSalle }}</span>
-                            </v-card-text>
-                          </v-card>
-                        </template>
-                      </template>
-                      <template v-else>
-                        <div class="empty-cell-width"></div>
+                          <v-card-text class="d-flex flex-column align-center justify-center text-wrap">
+                            <span class="text-center text-uppercase font-weight-bold">
+                              {{ horaire.appelationelement }}
+                            </span>
+                            <span>{{ horaire.appelationenseignant }}</span>
+                            <span>{{ horaire.NumeroSalle }}</span>
+                          </v-card-text>
+                        </v-card>
                       </template>
                     </template>
+                    <template v-else>
+                      <div class="empty-cell-width"></div>
+                    </template>
+                    <!-- </template> -->
                   </div>
                 </td>
               </template>
 
             </tr>
           </template>
+
+          <template v-slot:loading>
+            <v-row>
+              <v-col cols="12" class="text-center">
+                <span class="text-subtitle-1">Veuillez patienter...</span>
+              </v-col>
+            </v-row>
+          </template>
+
           <template v-slot:bottom></template>
         </v-data-table>
       </v-col>
     </v-row>
   </div>
 
-  <v-dialog v-model="editerDialog" persistent max-width="750px" transition="fab-transition">
+  <v-dialog v-model="editerDialog" persistent max-width="750px" transition="scroll-x-reverse-transition">
     <v-card>
       <v-card-title class="text-button">
         <h3>Editer</h3>
@@ -399,7 +419,7 @@ onMounted(async () => {
     </v-card>
   </v-dialog>
 
-  <v-dialog v-model="ajouterDialog" persistent max-width="750px" transition="slide-y-reverse-transition">
+  <v-dialog v-model="ajouterDialog" persistent max-width="750px" transition="scroll-x-reverse-transition">
     <v-card>
       <v-card-title class="text-button">
         <h3>Ajouter</h3>
