@@ -25,6 +25,14 @@ export default defineNuxtConfig({
   vuetify: {
     vuetifyOptions: {
       directives: true,
+      locale: {
+        locale: "fr",
+      },
+      // date: {
+      //   locale: {
+      //     fr: "fr-FR"
+      //   }
+      // },
       icons: {
         defaultSet: "mdi",
       }

@@ -126,9 +126,10 @@ const niveaux = ["L1", "L2", "L3", "M1", "M2"];
 let indexNiveau = 0;
 const niveau = ref(niveaux[indexNiveau]);
 
+const tableLoading = ref(false);
+// const datePickerMenu = ref(false);
 const editerDialog = ref(false);
 const ajouterDialog = ref(false);
-const tableLoading = ref(false);
 // CONSTANTES ----------------------------------------------------------------------------------
 
 
@@ -159,7 +160,6 @@ const prendreSemaine = (actualDate) => {
   finSemaine.value = new Date(actualDate);
   finSemaine.value.setDate(actualDate.getDate() + (6 - numeroJour.value));
 };
-
 
 
 const fusionnerSimilaire = async (data) => {
@@ -293,32 +293,45 @@ onBeforeMount(async () => {
   <div>
     <v-row class="bg-white border rounded-lg mx-auto">
 
-      <v-col cols="12" sm="3"
+      <v-col cols="12" sm="2"
         class="text-center text-overline text-md-button d-flex flex-row align-center justify-space-around">
-        <v-btn variant="text" icon="mdi-chevron-left" @click="changerNiveau('moins')" />
-        <h2>{{ niveau }}</h2>
-        <v-btn variant="text" icon="mdi-chevron-right" @click="changerNiveau('plus')" />
+        <v-btn variant="text" icon="mdi-chevron-left" :disabled="indexNiveau == 0" @click="changerNiveau('moins')" />
+        <h2 class="flex-grow-1">{{ niveau }}</h2>
+        <v-btn variant="text" icon="mdi-chevron-right" :disabled="indexNiveau == (niveaux.length - 1)"
+          @click="changerNiveau('plus')" />
       </v-col>
 
-      <ClientOnly>
-        <v-col cols="12" sm="7" class="d-flex flex-row align-center justify-space-around">
-          <v-btn variant="text" icon="mdi-chevron-left" @click="changerSemaine('moins')" />
+      <v-col cols="12" sm="7" class="d-flex flex-row align-center justify-space-around">
+        <v-btn variant="text" icon="mdi-chevron-left" @click="changerSemaine('moins')" />
+        <ClientOnly>
           <div
-            class="text-center text-overline text-md-button d-flex flex-column flex-sm-row align-center justify-space-evenly">
-            <h2>{{ debutLisible }}<span v-if="debutSemaine.getFullYear() != finSemaine.getFullYear()">{{ " " +
-          debutSemaine.getFullYear() }}</span></h2>
+            class="flex-grow-1 text-center text-overline text-md-button d-flex flex-column flex-md-row align-center justify-space-evenly">
+            <h2>
+              {{ debutLisible }}
+              <span v-if="debutSemaine.getFullYear() != finSemaine.getFullYear()">
+                {{ " " + debutSemaine.getFullYear() }}
+              </span>
+            </h2>
             <h2>-</h2>
             <h2>{{ finLisible }}<span>{{ " " + finSemaine.getFullYear() }}</span></h2>
           </div>
-          <v-btn variant="text" icon="mdi-chevron-right" @click="changerSemaine('plus')" />
-        </v-col>
-      </ClientOnly>
+        </ClientOnly>
+        <v-btn variant="text" icon="mdi-chevron-right" @click="changerSemaine('plus')" />
+      </v-col>
 
-      <v-col cols="12" sm="2">
+      <!-- <v-col cols="12" sm="2">
+        <v-select model-value="dateActuelle" density="compact" variant="outlined" @click="datePickerMenu = !datePickerMenu">
+        </v-select>
+        <v-menu v-model="datePickerMenu" class="align-center justify-center">
+          <v-date-picker v-model="dateActuelle"></v-date-picker>
+        </v-menu>
+      </v-col> -->
+      <v-col cols="12" sm="1">
         <v-btn color="success">Ajouter</v-btn>
       </v-col>
 
     </v-row>
+
     <v-row>
       <v-col cols="12">
         <v-data-table :loading="tableLoading" loading-text="aksdjfjaklsdjf" :headers="tableHeaders" :items="tableItems"
@@ -412,7 +425,20 @@ onBeforeMount(async () => {
         <h3>Editer</h3>
       </v-card-title>
       <v-card-text>
-        <v-text-field variant="outlined" label="temps"></v-text-field>
+        <v-row>
+          <v-col cols="12">
+            <v-text-field variant="outlined" label="Classe"></v-text-field>
+          </v-col>
+          <v-col cols="12" md="6">
+            <v-text-field variant="outlined" label="Element constitutif"></v-text-field>
+          </v-col>
+          <v-col cols="12" md="6">
+            <v-text-field variant="outlined" label="Enseignant"></v-text-field>
+          </v-col>
+          <v-col cols="12">
+            <v-text-field variant="outlined" label="Salle"></v-text-field>
+          </v-col>
+        </v-row>
       </v-card-text>
       <v-card-actions class="d-flex justify-end">
         <v-btn @click="editerDialog = !editerDialog">fermer</v-btn>
