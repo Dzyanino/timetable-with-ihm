@@ -50,52 +50,52 @@ const tableItems = ref([
     ],
     jours: {
       lundi: {
-        prem: [],
-        deux: [],
-        trois: [],
-        quatre: [],
-        cinq: [],
-        six: [],
+        1: [],
+        2: [],
+        3: [],
+        4: [],
+        5: [],
+        6: [],
       },
       mardi: {
-        prem: [],
-        deux: [],
-        trois: [],
-        quatre: [],
-        cinq: [],
-        six: [],
+        1: [],
+        2: [],
+        3: [],
+        4: [],
+        5: [],
+        6: [],
       },
       mercredi: {
-        prem: [],
-        deux: [],
-        trois: [],
-        quatre: [],
-        cinq: [],
-        six: [],
+        1: [],
+        2: [],
+        3: [],
+        4: [],
+        5: [],
+        6: [],
       },
       jeudi: {
-        prem: [],
-        deux: [],
-        trois: [],
-        quatre: [],
-        cinq: [],
-        six: [],
+        1: [],
+        2: [],
+        3: [],
+        4: [],
+        5: [],
+        6: [],
       },
       vendredi: {
-        prem: [],
-        deux: [],
-        trois: [],
-        quatre: [],
-        cinq: [],
-        six: [],
+        1: [],
+        2: [],
+        3: [],
+        4: [],
+        5: [],
+        6: [],
       },
       samedi: {
-        prem: [],
-        deux: [],
-        trois: [],
-        quatre: [],
-        cinq: [],
-        six: [],
+        1: [],
+        2: [],
+        3: [],
+        4: [],
+        5: [],
+        6: [],
       },
     },
   },
@@ -116,7 +116,7 @@ const finSemaine = ref(null);
 const debutLisible = ref("-");
 const finLisible = ref("-");
 
-const niveau = ref("L1");
+const niveau = ref("L2");
 
 const editerDialog = ref(false);
 const ajouterDialog = ref(false);
@@ -175,8 +175,7 @@ const fusionnerSimilaire = (data) => {
         AllNumeroEdt: [actuelle.NumeroEdt],
         ...actuelle,
         Classe: [
-          (actuelle.appelationparcours == null ? "" : actuelle.appelationparcours) +
-            (actuelle.CodeGroupe == null ? "" : " " + actuelle.CodeGroupe),
+          (actuelle.appelationparcours || "") + ((actuelle.CodeGroupe != null) ? " " : "") + (actuelle.CodeGroupe || ""),
         ],
       };
     } else if (actuelle.CodeParcours === donneesExistantes.CodeParcours) {
@@ -193,12 +192,8 @@ const fusionnerSimilaire = (data) => {
         AllNumeroEdt: [donneesExistantes.NumeroEdt, actuelle.NumeroEdt],
         ...actuelle,
         Classe: [
-        (donneesExistantes.appelationparcours == null ? "" : donneesExistantes.appelationparcours) +
-            (donneesExistantes.CodeGroupe == null
-              ? ""
-              : " " + donneesExistantes.CodeGroupe),
-              (actuelle.appelationparcours == null ? "" : actuelle.appelationparcours) +
-            (actuelle.CodeGroupe == null ? "" : " " + actuelle.CodeGroupe),
+          (donneesExistantes.appelationparcours || "") + ((donneesExistantes.CodeGroupe != null) ? " " : "") + (donneesExistantes.CodeGroupe || ""),
+          (actuelle.appelationparcours || "") + ((actuelle.CodeGroupe != null) ? " " : "") + (actuelle.CodeGroupe || ""),
         ],
       };
     }
@@ -207,6 +202,11 @@ const fusionnerSimilaire = (data) => {
   }, {});
 
   return dataFusionnee;
+};
+
+const transformerDonnees = (data) => {
+  const edtFusionne = Object.values(fusionnerSimilaire(data));
+  return edtFusionne;
 };
 
 const remplirTableItems = (data) => {
@@ -221,27 +221,16 @@ const remplirTableItems = (data) => {
           const creneau = jour[horaires];
           const edt = data.filter((ele) => {
             const day = new Date(ele.Date).getDay();
-            console.log(ele.Date);
+            return day == i + 1 && ele.Horaire == j + 1;
           });
-          // console.log(edt);
+          creneau.push(edt);
           j++;
         }
       }
-      // console.log(i);
       i++;
     }
   }
-};
-
-const transformerDonnees = (data) => {
-  // const matin = data.filter((edt) => edt.Horaire < 4);
-  // const aprem = data.filter((edt) => edt.Horaire >= 4);
-
-  const matinFusionne = Object.values(fusionnerSimilaire(data));
-  // const apremFusionne = Object.values(fusionnerSimilaire(aprem));
-
-  // remplirTableItems(matinFusionne);
-  console.log(matinFusionne);
+  console.log(tableItems.value[0].jours);
 };
 
 const initDonnees = async () => {
@@ -253,7 +242,7 @@ const initDonnees = async () => {
       finSemaine: formatterDate(finSemaine.value),
     },
   });
-  transformerDonnees(edt);
+  remplirTableItems(transformerDonnees(edt));
 };
 // MADE FONCTIONS -----------------------------------------------------------------------------------
 
@@ -273,11 +262,8 @@ onMounted(async () => {
       <v-col cols="12" sm="3" class="text-center text-overline text-md-button">
         <h2>{{ niveau }}</h2>
       </v-col>
-      <v-col
-        cols="12"
-        sm="7"
-        class="text-center text-overline text-md-button d-flex flex-column flex-sm-row align-center justify-center justify-sm-space-evenly"
-      >
+      <v-col cols="12" sm="7"
+        class="text-center text-overline text-md-button d-flex flex-column flex-sm-row align-center justify-center justify-sm-space-evenly">
         <h2>{{ debutLisible }}</h2>
         <h2>-</h2>
         <h2>{{ finLisible }}</h2>
@@ -288,32 +274,69 @@ onMounted(async () => {
     </v-row>
     <v-row>
       <v-col cols="12">
-        <v-data-table
-          sticky
-          :headers="tableHeaders"
-          :items="tableItems"
-          class="border-t border-e border-b rounded mb-4"
-          color="green"
-        >
+        <v-data-table sticky :headers="tableHeaders" :items="tableItems" class="border-t border-e border-b rounded mb-4"
+          color="green">
+
           <template v-slot:headers="{ columns }">
             <tr>
-              <td
-                class="border-s border-b text-center text-overline"
-                width="75px"
-              >
+              <td class="border-s border-b text-center text-overline" width="75px">
                 #
               </td>
               <template v-for="column in columns" :key="column.key">
-                <td
-                  class="border-s border-b text-center text-overline"
-                  width="250px"
-                >
+                <td class="border-s border-b text-center text-overline" width="250px">
                   <span>{{ column.title }}</span>
                 </td>
               </template>
             </tr>
           </template>
-          <!-- dffffffffffffffffffffffffffffffffff -->
+
+          <template v-slot:item="{ item }">
+            <tr v-for="(heure, index) in item.heures" :key="index">
+
+              <td class="border-s px-1">
+                <div class="d-flex flex-row align-center justify-center">
+                  <v-sheet width="50px" class="text-center text-overline">
+                    {{ heure }}
+                  </v-sheet>
+                </div>
+              </td>
+
+              <template v-for="jour in joursSemaine" :key="jour">
+                <td class="border-s bg-grey-lighten-5 px-0">
+                  <div class="d-flex flex-row align-center justify-center w-100">
+                    <template v-if="item.jours[jour][index + 1].length > 0"
+                      v-for="horaire in item.jours[jour][index + 1]" :key="horaire.NumeroEdt">
+                      <v-card class="elevation-0 rounded-0 cellule-hover" width="100%"
+                        @click="editerDialog = !editerDialog">
+                        <v-card-title class="d-flex align-center justify-center text-body-1 font-weight-light">
+                          <template v-for="grp in horaire.AllNumeroEdt" :key="grp">
+                            <template>
+                              <span>{{ grp }}</span>
+                            </template>
+                            <!-- <template v-else>
+                              <span>-</span>
+                              <span>
+                                {{ grp }}</span>
+                            </template> -->
+                          </template>
+                        </v-card-title>
+
+                        <v-card-text class="d-flex flex-column align-center justify-center">
+                          <span class="text-center text-uppercase font-weight-bold">{{ horaire.appelationelement
+                            }}</span>
+                          <span>{{ horaire.appelationenseignant }}</span>
+                          <span>{{ horaire.NumeroSalle }}</span>
+                        </v-card-text>
+                      </v-card>
+                    </template>
+                    <template v-else>
+                      <div class="empty-cell-width"></div>
+                    </template>
+                  </div>
+                </td>
+              </template>
+            </tr>
+          </template>
 
           <template v-slot:bottom></template>
         </v-data-table>
@@ -321,12 +344,7 @@ onMounted(async () => {
     </v-row>
   </div>
 
-  <v-dialog
-    v-model="editerDialog"
-    persistent
-    max-width="750px"
-    transition="fab-transition"
-  >
+  <v-dialog v-model="editerDialog" persistent max-width="750px" transition="fab-transition">
     <v-card>
       <v-card-title class="text-button">
         <h3>Editer</h3>
@@ -341,12 +359,7 @@ onMounted(async () => {
     </v-card>
   </v-dialog>
 
-  <v-dialog
-    v-model="ajouterDialog"
-    persistent
-    max-width="750px"
-    transition="slide-y-reverse-transition"
-  >
+  <v-dialog v-model="ajouterDialog" persistent max-width="750px" transition="slide-y-reverse-transition">
     <v-card>
       <v-card-title class="text-button">
         <h3>Ajouter</h3>
@@ -374,407 +387,12 @@ onMounted(async () => {
 }
 
 /* 
-          <template v-slot:item="{ item }">
-            <tr>
-              <td class="border-s px-1">
-                <div class="d-flex flex-row align-center justify-center">
-                  <v-sheet width="50px" class="text-center text-overline">
-                    {{ item.heures[0] }}
-                  </v-sheet>
-                </div>
-              </td>
-              <template v-for="(jour, index) in joursSemaine" :key="index">
-                <td class="border-s bg-grey-lighten-5 px-0">
-                  <div
-                    class="d-flex flex-row align-center justify-center w-100"
-                  >
-                    <template
-                      v-if="item[jour].prem.length > 0"
-                      v-for="horaire in item[jour].prem"
-                      :key="horaire.id"
-                    >
-                      <v-card
-                        class="elevation-0 rounded-0 cellule-hover"
-                        width="100%"
-                        @click="editerDialog = !editerDialog"
-                      >
-                        <v-card-title
-                          class="d-flex align-center justify-center text-body-1 font-weight-light"
-                        >
-                          <template
-                            v-for="(grp, index) in horaire.groupe"
-                            :key="index"
-                          >
-                            <template v-if="index == 0">
-                              <span>{{ grp }}</span>
-                            </template>
-                            <template v-else>
-                              <span>-</span>
-                              <span> {{ grp }}</span>
-                            </template>
-                          </template>
-                        </v-card-title>
-
-                        <v-card-text
-                          class="d-flex flex-column align-center justify-center"
-                        >
-                          <span
-                            class="text-center text-uppercase font-weight-bold"
-                            >{{ horaire.matiere }}</span
-                          >
-                          <span>{{ horaire.prof }}</span>
-                          <span>{{ horaire.salle }}</span>
-                        </v-card-text>
-                      </v-card>
-                    </template>
-                    <template v-else>
-                      <div class="empty-cell-width"></div>
-                      <!-- <v-card class="elevation-0 rounded-0 empty-cell-width bg-transparent">
-                                                <v-card-text class="text-center">
-                                                    <v-btn size="small" variant="tonal" color="primary" prepend-icon="mdi-plus" @click="ajouterDialog = !ajouterDialog">
-                                                        {{ index }}
-                                                    </v-btn>
-                                                </v-card-text>
-                                            </v-card> -->
-                    </template>
-                  </div>
-                </td>
-              </template>
-            </tr>
-            <tr>
-              <td class="border-s px-1">
-                <div class="d-flex flex-row align-center justify-center">
-                  <v-sheet width="50px" class="text-center text-overline">
-                    {{ item.heures[1] }}
-                  </v-sheet>
-                </div>
-              </td>
-              <template v-for="(jour, index) in joursSemaine" :key="index">
-                <td class="border-s bg-grey-lighten-5 px-0">
-                  <div
-                    class="d-flex flex-row align-center justify-center w-100"
-                  >
-                    <template
-                      v-if="item[jour].deux.length > 0"
-                      v-for="horaire in item[jour].deux"
-                      :key="horaire.id"
-                    >
-                      <v-card
-                        class="elevation-0 rounded-0 cellule-hover"
-                        width="100%"
-                        @click="editerDialog = !editerDialog"
-                      >
-                        <v-card-title
-                          class="d-flex align-center justify-center text-body-1 font-weight-light"
-                        >
-                          <template
-                            v-for="(grp, index) in horaire.groupe"
-                            :key="index"
-                          >
-                            <template v-if="index == 0">
-                              <span>{{ grp }}</span>
-                            </template>
-                            <template v-else>
-                              <span>-</span>
-                              <span> {{ grp }}</span>
-                            </template>
-                          </template>
-                        </v-card-title>
-
-                        <v-card-text
-                          class="d-flex flex-column align-center justify-center"
-                        >
-                          <span
-                            class="text-center text-uppercase font-weight-bold"
-                            >{{ horaire.matiere }}</span
-                          >
-                          <span>{{ horaire.prof }}</span>
-                          <span>{{ horaire.salle }}</span>
-                        </v-card-text>
-                      </v-card>
-                    </template>
-                    <template v-else>
-                      <div class="empty-cell-width"></div>
-                      <!-- <v-card class="elevation-0 rounded-0 empty-cell-width bg-transparent">
-                                                <v-card-text class="text-center">
-                                                    <v-btn size="small" variant="tonal" color="primary" prepend-icon="mdi-plus" @click="ajouterDialog = !ajouterDialog">
-                                                        {{ index }}
-                                                    </v-btn>
-                                                </v-card-text>
-                                            </v-card> -->
-                    </template>
-                  </div>
-                </td>
-              </template>
-            </tr>
-            <tr>
-              <td class="border-s px-1">
-                <div class="d-flex flex-row align-center justify-center">
-                  <v-sheet width="50px" class="text-center text-overline">
-                    {{ item.heures[2] }}
-                  </v-sheet>
-                </div>
-              </td>
-              <template v-for="(jour, index) in joursSemaine" :key="index">
-                <td class="border-s bg-grey-lighten-5 px-0">
-                  <div
-                    class="d-flex flex-row align-center justify-center w-100"
-                  >
-                    <template
-                      v-if="item[jour].trois.length > 0"
-                      v-for="horaire in item[jour].trois"
-                      :key="horaire.id"
-                    >
-                      <v-card
-                        class="elevation-0 rounded-0 cellule-hover"
-                        width="100%"
-                        @click="editerDialog = !editerDialog"
-                      >
-                        <v-card-title
-                          class="d-flex align-center justify-center text-body-1 font-weight-light"
-                        >
-                          <template
-                            v-for="(grp, index) in horaire.groupe"
-                            :key="index"
-                          >
-                            <template v-if="index == 0">
-                              <span>{{ grp }}</span>
-                            </template>
-                            <template v-else>
-                              <span>-</span>
-                              <span> {{ grp }}</span>
-                            </template>
-                          </template>
-                        </v-card-title>
-
-                        <v-card-text
-                          class="d-flex flex-column align-center justify-center"
-                        >
-                          <span
-                            class="text-center text-uppercase font-weight-bold"
-                            >{{ horaire.matiere }}</span
-                          >
-                          <span>{{ horaire.prof }}</span>
-                          <span>{{ horaire.salle }}</span>
-                        </v-card-text>
-                      </v-card>
-                    </template>
-                    <template v-else>
-                      <div class="empty-cell-width"></div>
-                      <!-- <v-card class="elevation-0 rounded-0 empty-cell-width bg-transparent">
-                                                <v-card-text class="text-center">
-                                                    <v-btn size="small" variant="tonal" color="primary" prepend-icon="mdi-plus" @click="ajouterDialog = !ajouterDialog">
-                                                        {{ index }}
-                                                    </v-btn>
-                                                </v-card-text>
-                                            </v-card> -->
-                    </template>
-                  </div>
-                </td>
-              </template>
-            </tr>
-            <tr>
-              <td colspan="7" class="border-s"></td>
-            </tr>
-
-            <tr>
-              <td class="border-s px-1">
-                <div class="d-flex flex-row align-center justify-center">
-                  <v-sheet width="50px" class="text-center text-overline">
-                    {{ item.heures[3] }}
-                  </v-sheet>
-                </div>
-              </td>
-              <template v-for="(jour, index) in joursSemaine" :key="index">
-                <td class="border-s bg-grey-lighten-5 px-0">
-                  <div
-                    class="d-flex flex-row align-center justify-center w-100"
-                  >
-                    <template
-                      v-if="item[jour].quatre.length > 0"
-                      v-for="horaire in item[jour].quatre"
-                      :key="horaire.id"
-                    >
-                      <v-card
-                        class="elevation-0 rounded-0 cellule-hover"
-                        width="100%"
-                        @click="editerDialog = !editerDialog"
-                      >
-                        <v-card-title
-                          class="d-flex align-center justify-center text-body-1 font-weight-light"
-                        >
-                          <template
-                            v-for="(grp, index) in horaire.groupe"
-                            :key="index"
-                          >
-                            <template v-if="index == 0">
-                              <span>{{ grp }}</span>
-                            </template>
-                            <template v-else>
-                              <span>-</span>
-                              <span> {{ grp }}</span>
-                            </template>
-                          </template>
-                        </v-card-title>
-
-                        <v-card-text
-                          class="d-flex flex-column align-center justify-center"
-                        >
-                          <span
-                            class="text-center text-uppercase font-weight-bold"
-                            >{{ horaire.matiere }}</span
-                          >
-                          <span>{{ horaire.prof }}</span>
-                          <span>{{ horaire.salle }}</span>
-                        </v-card-text>
-                      </v-card>
-                    </template>
-                    <template v-else>
-                      <div class="empty-cell-width"></div>
-                      <!-- <v-card class="elevation-0 rounded-0 empty-cell-width bg-transparent">
-                                                <v-card-text class="text-center">
-                                                    <v-btn size="small" variant="tonal" color="primary" prepend-icon="mdi-plus" @click="ajouterDialog = !ajouterDialog">
-                                                        {{ index }}
-                                                    </v-btn>
-                                                </v-card-text>
-                                            </v-card> -->
-                    </template>
-                  </div>
-                </td>
-              </template>
-            </tr>
-            <tr>
-              <td class="border-s px-1">
-                <div class="d-flex flex-row align-center justify-center">
-                  <v-sheet width="50px" class="text-center text-overline">
-                    {{ item.heures[4] }}
-                  </v-sheet>
-                </div>
-              </td>
-              <template v-for="(jour, index) in joursSemaine" :key="index">
-                <td class="border-s bg-grey-lighten-5 px-0">
-                  <div
-                    class="d-flex flex-row align-center justify-center w-100"
-                  >
-                    <template
-                      v-if="item[jour].cinq.length > 0"
-                      v-for="horaire in item[jour].cinq"
-                      :key="horaire.id"
-                    >
-                      <v-card
-                        class="elevation-0 rounded-0 cellule-hover"
-                        width="100%"
-                        @click="editerDialog = !editerDialog"
-                      >
-                        <v-card-title
-                          class="d-flex align-center justify-center text-body-1 font-weight-light"
-                        >
-                          <template
-                            v-for="(grp, index) in horaire.groupe"
-                            :key="index"
-                          >
-                            <template v-if="index == 0">
-                              <span>{{ grp }}</span>
-                            </template>
-                            <template v-else>
-                              <span>-</span>
-                              <span> {{ grp }}</span>
-                            </template>
-                          </template>
-                        </v-card-title>
-
-                        <v-card-text
-                          class="d-flex flex-column align-center justify-center"
-                        >
-                          <span
-                            class="text-center text-uppercase font-weight-bold"
-                            >{{ horaire.matiere }}</span
-                          >
-                          <span>{{ horaire.prof }}</span>
-                          <span>{{ horaire.salle }}</span>
-                        </v-card-text>
-                      </v-card>
-                    </template>
-                    <template v-else>
-                      <div class="empty-cell-width"></div>
-                      <!-- <v-card class="elevation-0 rounded-0 empty-cell-width bg-transparent">
-                                                <v-card-text class="text-center">
-                                                    <v-btn size="small" variant="tonal" color="primary" prepend-icon="mdi-plus" @click="ajouterDialog = !ajouterDialog">
-                                                        {{ index }}
-                                                    </v-btn>
-                                                </v-card-text>
-                                            </v-card> -->
-                    </template>
-                  </div>
-                </td>
-              </template>
-            </tr>
-            <tr>
-              <td class="border-s px-1">
-                <div class="d-flex flex-row align-center justify-center">
-                  <v-sheet width="50px" class="text-center text-overline">
-                    {{ item.heures[5] }}
-                  </v-sheet>
-                </div>
-              </td>
-              <template v-for="(jour, index) in joursSemaine" :key="index">
-                <td class="border-s bg-grey-lighten-5 px-0">
-                  <div
-                    class="d-flex flex-row align-center justify-center w-100"
-                  >
-                    <template
-                      v-if="item[jour].six.length > 0"
-                      v-for="horaire in item[jour].six"
-                      :key="horaire.id"
-                    >
-                      <v-card
-                        class="elevation-0 rounded-0 cellule-hover"
-                        width="100%"
-                        @click="editerDialog = !editerDialog"
-                      >
-                        <v-card-title
-                          class="d-flex align-center justify-center text-body-1 font-weight-light"
-                        >
-                          <template
-                            v-for="(grp, index) in horaire.groupe"
-                            :key="index"
-                          >
-                            <template v-if="index == 0">
-                              <span>{{ grp }}</span>
-                            </template>
-                            <template v-else>
-                              <span>-</span>
-                              <span> {{ grp }}</span>
-                            </template>
-                          </template>
-                        </v-card-title>
-
-                        <v-card-text
-                          class="d-flex flex-column align-center justify-center"
-                        >
-                          <span
-                            class="text-center text-uppercase font-weight-bold"
-                            >{{ horaire.matiere }}</span
-                          >
-                          <span>{{ horaire.prof }}</span>
-                          <span>{{ horaire.salle }}</span>
-                        </v-card-text>
-                      </v-card>
-                    </template>
-                    <template v-else>
-                      <div class="empty-cell-width"></div>
-                      <!-- <v-card class="elevation-0 rounded-0 empty-cell-width bg-transparent">
-                                                <v-card-text class="text-center">
-                                                    <v-btn size="small" variant="tonal" color="primary" prepend-icon="mdi-plus" @click="ajouterDialog = !ajouterDialog">
-                                                        {{ index }}
-                                                    </v-btn>
-                                                </v-card-text>
-                                            </v-card> -->
-                    </template>
-                  </div>
-                </td>
-              </template>
-            </tr>
-          </template>
+<!-- <v-card class="elevation-0 rounded-0 empty-cell-width bg-transparent">
+    <v-card-text class="text-center">
+        <v-btn size="small" variant="tonal" color="primary" prepend-icon="mdi-plus" @click="ajouterDialog = !ajouterDialog">
+            {{ index }}
+        </v-btn>
+    </v-card-text>
+</v-card> -->
  */
 </style>
