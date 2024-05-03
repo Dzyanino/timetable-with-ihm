@@ -121,22 +121,11 @@ const niveau = ref("L2");
 const editerDialog = ref(false);
 const ajouterDialog = ref(false);
 // CONSTANTES ----------------------------------------------------------------------------------
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
+
+
+
+
+
 // MADE FONCTIONS -----------------------------------------------------------------------------------
 const dateLisible = (date) => {
   /*   DD MMMM   */
@@ -164,9 +153,9 @@ const prendreSemaine = (actualDate) => {
   finSemaine.value.setDate(actualDate.getDate() + (6 - numeroJour.value));
 };
 
-const fusionnerSimilaire = (data) => {
+const fusionnerSimilaire = async (data) => {
   /* Meme cours, classes differentes */
-  const dataFusionnee = data.reduce((accumulee, actuelle) => {
+  const dataFusionnee = await data.reduce((accumulee, actuelle) => {
     const key = `${actuelle.Date}-${actuelle.Horaire}-${actuelle.NumeroSalle}-${actuelle.IdEnseignant}-${actuelle.CodeElement}`;
     const donneesExistantes = accumulee[key];
 
@@ -204,12 +193,12 @@ const fusionnerSimilaire = (data) => {
   return dataFusionnee;
 };
 
-const transformerDonnees = (data) => {
-  const edtFusionne = Object.values(fusionnerSimilaire(data));
+const transformerDonnees = async (data) => {
+  const edtFusionne = Object.values(await fusionnerSimilaire(data));
   return edtFusionne;
 };
 
-const remplirTableItems = (data) => {
+const remplirTableItems = async (data) => {
   let i = 0;
   for (const jours in tableItems.value[0].jours) {
     if (Object.hasOwnProperty.call(tableItems.value[0].jours, jours)) {
@@ -223,7 +212,7 @@ const remplirTableItems = (data) => {
             const day = new Date(ele.Date).getDay();
             return day == i + 1 && ele.Horaire == j + 1;
           });
-          creneau.push(edt);
+          await creneau.push(edt);
           j++;
         }
       }
@@ -242,31 +231,43 @@ const initDonnees = async () => {
       finSemaine: formatterDate(finSemaine.value),
     },
   });
-  remplirTableItems(transformerDonnees(edt));
+  await remplirTableItems(await transformerDonnees(edt));
 };
 // MADE FONCTIONS -----------------------------------------------------------------------------------
 
-onBeforeMount(() => {
+
+
+
+// BUILT-IN FUNCTION -----------------------------------------------------------------------------------
+onBeforeMount(async () => {
   prendreSemaine(dateActuelle.value);
   debutLisible.value = dateLisible(debutSemaine.value);
   finLisible.value = dateLisible(finSemaine.value);
-});
-onMounted(async () => {
   await initDonnees();
 });
+// onMounted(() => {
+// });
+// BUILT-IN FUNCTION -----------------------------------------------------------------------------------
 </script>
 
 <template>
   <div>
-    <v-row class="border-lg rounded-lg">
-      <v-col cols="12" sm="3" class="text-center text-overline text-md-button">
+    <v-row class="bg-white border rounded-lg mx-auto">
+      <v-col cols="12" sm="3"
+        class="text-center text-overline text-md-button d-flex flex-row align-center justify-space-evenly">
+        <v-btn variant="tonal" color="success" icon="mdi-chevron-left" />
         <h2>{{ niveau }}</h2>
+        <v-btn variant="tonal" color="success" icon="mdi-chevron-right" />
       </v-col>
-      <v-col cols="12" sm="7"
-        class="text-center text-overline text-md-button d-flex flex-column flex-sm-row align-center justify-center justify-sm-space-evenly">
-        <h2>{{ debutLisible }}</h2>
-        <h2>-</h2>
-        <h2>{{ finLisible }}</h2>
+      <v-col cols="12" sm="7" class="d-flex flex-row align-center justify-space-evenly">
+        <v-btn variant="tonal" color="success" icon="mdi-chevron-left" />
+        <div
+          class="text-center text-overline text-md-button d-flex flex-column flex-sm-row align-center justify-space-evenly">
+          <h2>{{ debutLisible }}</h2>
+          <h2>-</h2>
+          <h2>{{ finLisible }}</h2>
+        </div>
+        <v-btn variant="tonal" color="success" icon="mdi-chevron-right" />
       </v-col>
       <v-col cols="12" sm="2">
         <v-btn color="success">Ajouter</v-btn>
@@ -294,7 +295,7 @@ onMounted(async () => {
             <tr v-for="(heure, index) in item.heures" :key="index">
 
               <td class="border-s px-1">
-                <div class="d-flex flex-row align-center justify-center">
+                <div class="d-flex align-center justify-center">
                   <v-sheet width="50px" class="text-center text-overline">
                     {{ heure }}
                   </v-sheet>
@@ -302,8 +303,8 @@ onMounted(async () => {
               </td>
 
               <template v-for="jour in joursSemaine" :key="jour">
-                <td class="border-s bg-grey-lighten-5 px-0">
-                  <div class="d-flex flex-row align-center justify-center w-100">
+                <td class="border-s bg-grey-lighten-5 pa-0">
+                  <div class="d-flex flex-row align-center justify-center empty-cell-width">
                     <template v-if="item.jours[jour][index + 1].length > 0">
                       <template v-for="horaire in item.jours[jour][index + 1][0]" :key="horaire.NumeroEdt">
                         <v-card class="elevation-0 rounded-0 cellule-hover" width="100%"
@@ -321,8 +322,9 @@ onMounted(async () => {
                           </v-card-title>
 
                           <v-card-text class="d-flex flex-column align-center justify-center">
-                            <span class="text-center text-uppercase font-weight-bold">{{ horaire.appelationelement
-                              }}</span>
+                            <span class="text-center text-uppercase font-weight-bold">
+                              {{ horaire.appelationelement }}
+                            </span>
                             <span>{{ horaire.appelationenseignant }}</span>
                             <span>{{ horaire.NumeroSalle }}</span>
                           </v-card-text>
@@ -330,7 +332,7 @@ onMounted(async () => {
                       </template>
                     </template>
                     <template v-else>
-                      <div class="empty-cell-width"></div>
+                      <div class="empty-cell-width">asdf</div>
                     </template>
                   </div>
                 </td>
@@ -378,21 +380,25 @@ onMounted(async () => {
 
 <style>
 .empty-cell-width {
-  width: 250px;
-  height: 124px;
+  min-width: 250px;
+  /* height: 124px; */
 }
 
 .cellule-hover:hover {
   background-color: #f0f0f0;
 }
 
+
+/* .test {
+  overflow-y: auto;
+} */
 /* 
-<!-- <v-card class="elevation-0 rounded-0 empty-cell-width bg-transparent">
+<v-card class="elevation-0 rounded-0 empty-cell-width bg-transparent">
     <v-card-text class="text-center">
         <v-btn size="small" variant="tonal" color="primary" prepend-icon="mdi-plus" @click="ajouterDialog = !ajouterDialog">
             {{ index }}
         </v-btn>
     </v-card-text>
-</v-card> -->
+</v-card>
  */
 </style>
