@@ -6,13 +6,13 @@
 
 <script setup>
 useHead({
-  title: "Salles"
-})
+  title: "Salles",
+});
 
 definePageMeta({
   layout: "main-layout",
   pageTransition: {
-    name: 'slide'
+    name: "slide",
   },
-})
+});
 </script>

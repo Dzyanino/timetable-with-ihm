@@ -38,6 +38,7 @@ Example Code Snippet (Vue Template):
     </v-data-table>
 </template>
 ```
+
 Utilisez ce code avec précaution.
 
 Example Code Snippet (Vue Methods):
@@ -86,8 +87,6 @@ The formatCourses method transforms each data item into a course object with des
 The v-data-table uses scoped slots to display courses for each time slot.
 
 Remember to adjust the code based on your specific data structure and desired formatting logic. This provides a basic structure to get you started with displaying the EDT data in the required format using Vuetify's v-data-table and cards/sheets.
-
-
 
 The display should be like this :
 
@@ -193,8 +192,6 @@ You might need to adjust the logic for handling empty time slots (no courses) an
 
 This refined approach should provide the desired structure for displaying your EDT data in Vuetify's v-data-table with cards representing courses within each time slot on weekdays.
 
-
-
 You got the point but, it's actually that algorithm that made me stuck for days on that app
 I'm lost in the data structure and don't know what to do :(
 I'm not still used to use those kind of really nest Array and Objects
@@ -277,6 +274,7 @@ The transformedData array will now have the desired structure:
   // ... data for other weekdays
 ]
 ```
+
 Using the Transformed Data:
 
 This transformed data can be directly used in your Vue template with the nested scoped slots approach described earlier. The outer slot iterates through weekdays, the inner slot iterates through time slots for each day, and finally, you render course cards within each time slot.
@@ -288,8 +286,6 @@ Adjust the logic for handling weekdays, time slots, and empty slots based on you
 Use helper functions to improve code readability and maintainability.
 
 By following these steps and understanding the logic behind each stage, you should be able to transform your data into the desired nested structure and utilize it effectively in your Vuetify table component.
-
-
 
 Let's talk in french if you can
 My head is about to explode as i need to concentrate to not be lost in what you are saying
@@ -316,7 +312,7 @@ Utilisez ce code avec précaution.
 
 2. Grouper par jour:
 
-Parcourez vos données d'origine et regroupez les éléments en fonction du champ Date (en supposant qu'il représente les jours de la semaine). 
+Parcourez vos données d'origine et regroupez les éléments en fonction du champ Date (en supposant qu'il représente les jours de la semaine).
 
 Vous pouvez utiliser une fonction reduce ou une boucle avec un objet pour y parvenir :
 
@@ -353,7 +349,7 @@ for (const day in groupedByDay) {
 
 Utilisez ce code avec précaution.
 
-Ce code parcourt les cours de chaque jour et les regroupe en objets en fonction des créneaux horaires ('7H30' ou '9H00' dans cet exemple). 
+Ce code parcourt les cours de chaque jour et les regroupe en objets en fonction des créneaux horaires ('7H30' ou '9H00' dans cet exemple).
 
 Enfin, il pousse un objet contenant le nom du jour ('day') et ses groupes de créneaux horaires associés ('courses') dans le tableau transformedData.
 
@@ -385,10 +381,6 @@ Utilisez des fonctions d'assistance pour améliorer la lisibilité et la mainten
 
 En suivant ces étapes et en comprenant la logique derrière chaque étape, vous devriez être capable de transformer vos données dans la structure imbriquée souhaitée et de les utiliser efficacement dans votre composant de table Vuetify.
 
-
-
-
-
 D'accord, passons au français ! Je comprends votre frustration face aux structures de données imbriquées. Regardons la transformation des données étape par étape pour la rendre plus facile à assimiler.
 
 1. Fonction d'assistance (facultatif):
@@ -411,7 +403,7 @@ Utilisez ce code avec précaution.
 
 2. Grouper par jour:
 
-Parcourez vos données d'origine et regroupez les éléments en fonction du champ Date (en supposant qu'il représente les jours de la semaine). 
+Parcourez vos données d'origine et regroupez les éléments en fonction du champ Date (en supposant qu'il représente les jours de la semaine).
 
 Vous pouvez utiliser une fonction reduce ou une boucle avec un objet pour y parvenir :
 
@@ -448,7 +440,7 @@ for (const day in groupedByDay) {
 
 Utilisez ce code avec précaution.
 
-Ce code parcourt les cours de chaque jour et les regroupe en objets en fonction des créneaux horaires ('7H30' ou '9H00' dans cet exemple). 
+Ce code parcourt les cours de chaque jour et les regroupe en objets en fonction des créneaux horaires ('7H30' ou '9H00' dans cet exemple).
 
 Enfin, il pousse un objet contenant le nom du jour ('day') et ses groupes de créneaux horaires associés ('courses') dans le tableau transformedData.
 
