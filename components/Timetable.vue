@@ -107,14 +107,7 @@ const tableItems = ref([
   },
 ]);
 
-const joursSemaine = [
-  "lundi",
-  "mardi",
-  "mercredi",
-  "jeudi",
-  "vendredi",
-  "samedi",
-];
+const joursSemaine = ["lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi"];
 const dateActuelle = ref(new Date());
 const debutSemaine = ref(null);
 const finSemaine = ref(null);
@@ -125,6 +118,16 @@ const finLisible = ref("-");
 const niveaux = ["L1", "L2", "L3", "M1", "M2"];
 let indexNiveau = 0;
 const niveau = ref(niveaux[indexNiveau]);
+
+const classes = ref([]);
+const elements = ref([]);
+const enseignants = ref([]);
+const salles = ref([]);
+
+const classeChoisie = ref(null);
+const elementChoisi = ref(null);
+const enseignantChoisi = ref(null);
+const salleChoisie = ref(null);
 
 const tableLoading = ref(false);
 // const datePickerMenu = ref(false);
@@ -137,6 +140,17 @@ const ajouterDialog = ref(false);
 
 
 // MADE FONCTIONS -----------------------------------------------------------------------------------
+const comparerArray = (arr1, arr2) => {
+  /*   (array1 === array2) ?   */
+  return ((arr1.length === arr2.length) && arr1.every((element, index) => element === arr2[index]));
+};
+const transformerArray = (data) => {
+  /*   Data ==> Data[]   */
+  const tableau = Object.values(data);
+  return tableau;
+};
+
+
 const dateLisible = (date) => {
   /*   DD MMMM   */
   const options = { month: "long", day: "numeric" };//year: "numeric", 
@@ -199,13 +213,10 @@ const fusionnerSimilaire = async (data) => {
     return accumulee;
   }, {});
 
-  return dataFusionnee;
-};
-const transformerDonnees = async (data) => {
-  const edtTransformee = Object.values(await fusionnerSimilaire(data));
-  return edtTransformee;
+  return transformerArray(dataFusionnee);
 };
 const remplirTableItems = async (data) => {
+  /*   tableItems[] ==> tableItems[...]   */
   let i = 0;
   for (const jours in tableItems.value[0].jours) {
     if (Object.hasOwnProperty.call(tableItems.value[0].jours, jours)) {
@@ -230,6 +241,7 @@ const remplirTableItems = async (data) => {
   // console.log(tableItems.value[0].jours);
 };
 const initDonnees = async () => {
+  /*   BDD[...] ==> edt[...]   */
   tableLoading.value = true;
   const { edt } = await $fetch("/api/edt", {
     method: "POST",
@@ -240,13 +252,52 @@ const initDonnees = async () => {
     },
   });
   setTimeout(async () => {
-    await remplirTableItems(await transformerDonnees(edt))
+    await remplirTableItems(await fusionnerSimilaire(edt));
     tableLoading.value = false;
   }, 750)
+};
+const retrieveMainData = async () => {
+  /*   Retrieve EDT   */
+  prendreSemaine(dateActuelle.value);
+  debutLisible.value = dateLisible(debutSemaine.value);
+  finLisible.value = dateLisible(finSemaine.value);
+
+  await initDonnees();
+}
+
+
+const nommerClasse = async (data) => {
+  /*   [L1, IG, Gr1] ==> [L1 IG Gr1]   */
+  const classeNommee = await data.reduce((accumulee, actuelle) => {
+    const key = `${actuelle.CodeClasse}`;
+
+    accumulee[key] = {
+      ...actuelle,
+      Titre: {
+        title: (actuelle.Abbreviation || "") + ((!!actuelle.Abbreviation && !!actuelle.CodeGroupe) ? " " : "") + (actuelle.CodeGroupe || ""),
+        subtitle: actuelle.CodeNiveau,
+      },
+    };
+
+    return accumulee;
+  }, {});
+
+  return transformerArray(classeNommee);
+}
+const retrieveOtherData = async () => {
+  const { classe } = await $fetch("/api/classe", {
+    method: "POST",
+    body: {
+      niveau: niveau.value,
+    },
+  });
+
+  classes.value = await nommerClasse(classe);
 };
 
 
 const changerNiveau = async (sens) => {
+  /* L1 => L2 => L3 => ... */
   if (sens == "plus") {
     (indexNiveau >= 4) ? indexNiveau = 0 : indexNiveau++;
     niveau.value = niveaux[indexNiveau];
@@ -257,21 +308,26 @@ const changerNiveau = async (sens) => {
   }
 
   await initDonnees();
+  await retrieveOtherData();
 };
 const changerSemaine = async (sens) => {
+  /* dateActuelle +/- 7  */
   if (sens == "plus") {
     dateActuelle.value.setDate(dateActuelle.value.getDate() + 7);
   }
   else if (sens == "moins") {
     dateActuelle.value.setDate(dateActuelle.value.getDate() - 7);
   }
-
-  prendreSemaine(dateActuelle.value);
-  debutLisible.value = dateLisible(debutSemaine.value);
-  finLisible.value = dateLisible(finSemaine.value);
-
-  await initDonnees();
+  await retrieveMainData();
 };
+
+const afficherEditerDialog = (jour, heure, numero) => {
+  const choosen = tableItems.value[0].jours[joursSemaine[new Date(jour).getDay() - 1]][heure][0].filter((ele) => {
+    return comparerArray(ele.AllNumeroEdt, numero);
+  });
+
+  editerDialog.value = !editerDialog.value
+}
 // MADE FONCTIONS -----------------------------------------------------------------------------------
 
 
@@ -279,10 +335,8 @@ const changerSemaine = async (sens) => {
 
 // BUILT-IN FUNCTION -----------------------------------------------------------------------------------
 onBeforeMount(async () => {
-  prendreSemaine(dateActuelle.value);
-  debutLisible.value = dateLisible(debutSemaine.value);
-  finLisible.value = dateLisible(finSemaine.value);
-  await initDonnees();
+  await retrieveMainData();
+  await retrieveOtherData();
 });
 // onMounted(async () => {
 // });
@@ -371,7 +425,8 @@ onBeforeMount(async () => {
                     <ClientOnly>
                       <template v-if="item.jours[jour][index + 1][0].length > 0">
                         <template v-for="horaire in item.jours[jour][index + 1][0]" :key="horaire.NumeroEdt">
-                          <v-card hover flat class="flex-grow-1 rounded-0" @click="editerDialog = !editerDialog">
+                          <v-card hover flat class="flex-grow-1 rounded-0"
+                            @click="afficherEditerDialog(horaire.Date, horaire.Horaire, horaire.AllNumeroEdt)">
                             <v-card-title class="d-flex align-center justify-center text-body-1 font-weight-light">
                               <template v-for="(classe, occ) in horaire.Classe" :key="occ">
                                 <template v-if="occ == 0">
@@ -419,7 +474,7 @@ onBeforeMount(async () => {
     </v-row>
   </div>
 
-  <v-dialog v-model="editerDialog" persistent max-width="750px" transition="scroll-x-reverse-transition">
+  <v-dialog v-model="editerDialog" persistent max-width="750px" transition="scroll-y-reverse-transition">
     <v-card>
       <v-card-title class="text-button">
         <h3>Editer</h3>
@@ -427,15 +482,16 @@ onBeforeMount(async () => {
       <v-card-text>
         <v-row>
           <v-col cols="12">
-            <v-text-field variant="outlined" label="Classe"></v-text-field>
-          </v-col>
-          <v-col cols="12" md="6">
-            <v-text-field variant="outlined" label="Element constitutif"></v-text-field>
-          </v-col>
-          <v-col cols="12" md="6">
-            <v-text-field variant="outlined" label="Enseignant"></v-text-field>
+            <v-autocomplete v-model="classeChoisie" :items="classes" item-props="Titre" item-value="CodeClasse"
+              variant="outlined" multiple chips auto-select-first clear-on-select no-data-text="Vide..."label="Classe" />
           </v-col>
           <v-col cols="12">
+            <v-text-field variant="outlined" label="Element constitutif"></v-text-field>
+          </v-col>
+          <v-col cols="12" md="8">
+            <v-text-field variant="outlined" label="Enseignant"></v-text-field>
+          </v-col>
+          <v-col cols="12" md="4">
             <v-text-field variant="outlined" label="Salle"></v-text-field>
           </v-col>
         </v-row>
@@ -447,7 +503,7 @@ onBeforeMount(async () => {
     </v-card>
   </v-dialog>
 
-  <v-dialog v-model="ajouterDialog" persistent max-width="750px" transition="scroll-x-reverse-transition">
+  <v-dialog v-model="ajouterDialog" persistent max-width="750px" transition="scroll-y-reverse-transition">
     <v-card>
       <v-card-title class="text-button">
         <h3>Ajouter</h3>
