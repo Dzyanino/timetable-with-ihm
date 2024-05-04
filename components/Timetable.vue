@@ -286,24 +286,6 @@ const nommerClasse = async (data) => {
 
   return transformerArray(classeNommee);
 };
-const nommerElement = async (data) => {
-  /*   [Genie Logiciel, GLog] ==> [Glog - Genie Logiciel]   */
-  const elementNomme = await data.reduce((accumulee, actuelle) => {
-    const key = `${actuelle.CodeElement}`;
-
-    accumulee[key] = {
-      ...actuelle,
-      Titre: {
-        title: (actuelle.Designation || ""),
-        subtitle: (actuelle.Appelation || ""),
-      },
-    };
-
-    return accumulee;
-  }, {});
-
-  return transformerArray(elementNomme);
-};
 const nommerUnite = async (data) => {
   /*   [Electroniques, L1] ==> [Electronique L1]   */
   const uniteNomme = await data.reduce((accumulee, actuelle) => {
@@ -322,8 +304,51 @@ const nommerUnite = async (data) => {
 
   return transformerArray(uniteNomme);
 };
+const nommerElement = async (data) => {
+  /*   [Genie Logiciel, GLog] ==> [Glog - Genie Logiciel]   */
+  const elementNomme = await data.reduce((accumulee, actuelle) => {
+    const key = `${actuelle.CodeElement}`;
+
+    accumulee[key] = {
+      ...actuelle,
+      Titre: {
+        title: (actuelle.Appelation || ""),
+        subtitle: (actuelle.Designation || ""),
+      },
+    };
+
+    return accumulee;
+  }, {});
+
+  return transformerArray(elementNomme);
+};
+const nommerEnseignant = async (data) => {
+  /*   [Gilante GESAZAFY, Gilante] ==> [Gilante GESAZAFY - Gilante]   */
+  const enseignantNomme = await data.reduce((accumulee, actuelle) => {
+    const key = `${actuelle.IdEnseignant}`;
+
+    accumulee[key] = {
+      ...actuelle,
+      Titre: {
+        title: (actuelle.Appelation || ""),
+        subtitle: (actuelle.Nom || "") + ((!!actuelle.Nom && !!actuelle.Prenom) ? " " : "") + (actuelle.Prenom || ""),
+      },
+    };
+
+    return accumulee;
+  }, {});
+
+  return transformerArray(enseignantNomme);
+};
 const retrieveOtherData = async () => {
   const { classe_ } = await $fetch("/api/classe_", {
+    method: "POST",
+    body: {
+      niveau: niveau.value,
+    },
+  });
+
+  const { unite } = await $fetch("/api/unite", {
     method: "POST",
     body: {
       niveau: niveau.value,
@@ -334,16 +359,19 @@ const retrieveOtherData = async () => {
     method: "POST",
   });
 
-  const { unite } = await $fetch("/api/unite", {
+  const { enseignant } = await $fetch("/api/enseignant", {
     method: "POST",
-    body: {
-      niveau: niveau.value,
-    },
+  });
+
+  const { salle } = await $fetch("/api/salle", {
+    method: "POST",
   });
 
   classes.value = await nommerClasse(classe_);
-  elements.value = await nommerElement(element);
   unites.value = await nommerUnite(unite);
+  elements.value = await nommerElement(element);
+  enseignants.value = await nommerEnseignant(enseignant);
+  salles.value = salle;
 };
 
 
@@ -538,20 +566,21 @@ onBeforeMount(async () => {
               label="Classe" />
           </v-col>
           <v-col cols="12">
-            <v-autocomplete v-model="uniteChoisie" :items="unites" item-props="Titre"
-              item-value="CodeUnite" variant="outlined" auto-select-first no-data-text="Vide..."
-              label="Unité d'enseignement" />
+            <v-autocomplete v-model="uniteChoisie" :items="unites" item-props="Titre" item-value="CodeUnite"
+              variant="outlined" auto-select-first no-data-text="Vide..." label="Unité d'enseignement" />
           </v-col>
           <v-col cols="12">
-            <v-autocomplete :disabled="(uniteChoisie == null)" v-model="elementChoisi" :items="elements" item-props="Titre"
-              item-value="CodeElement" variant="outlined" auto-select-first no-data-text="Vide..."
+            <v-autocomplete :disabled="(uniteChoisie == null)" v-model="elementChoisi" :items="elements"
+              item-props="Titre" item-value="CodeElement" variant="outlined" auto-select-first no-data-text="Vide..."
               label="Element constitutif" />
           </v-col>
           <v-col cols="12" md="8">
-            <v-text-field variant="outlined" label="Enseignant"></v-text-field>
+            <v-autocomplete v-model="enseignantChoisi" :items="enseignants" item-props="Titre" item-value="IdEnseignant"
+              variant="outlined" auto-select-first no-data-text="Vide..." label="Enseignant" />
           </v-col>
           <v-col cols="12" md="4">
-            <v-text-field variant="outlined" label="Salle"></v-text-field>
+            <v-autocomplete v-model="salleChoisie" :items="salles" item-title="NumeroSalle" item-value="NumeroSalle"
+              variant="outlined" auto-select-first no-data-text="Vide..." label="Salle" />
           </v-col>
         </v-row>
       </v-card-text>
