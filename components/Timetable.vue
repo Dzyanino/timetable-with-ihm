@@ -283,7 +283,25 @@ const nommerClasse = async (data) => {
   }, {});
 
   return transformerArray(classeNommee);
-}
+};
+const nommerElement = async (data) => {
+  /*   [Genie Logiciel, GLog] ==> [Glog - Genie Logiciel]   */
+  const elementNomme = await data.reduce((accumulee, actuelle) => {
+    const key = `${actuelle.CodeElement}`;
+
+    accumulee[key] = {
+      ...actuelle,
+      Titre: {
+        title: (actuelle.designationelement || ""),
+        subtitle: (actuelle.Appelation || ""),
+      },
+    };
+
+    return accumulee;
+  }, {});
+
+  return transformerArray(elementNomme);
+};
 const retrieveOtherData = async () => {
   const { classe } = await $fetch("/api/classe", {
     method: "POST",
@@ -292,7 +310,15 @@ const retrieveOtherData = async () => {
     },
   });
 
+  const { element } = await $fetch("/api/element", {
+    method: "POST",
+    body: {
+      niveau: niveau.value,
+    },
+  });
+
   classes.value = await nommerClasse(classe);
+  elements.value = await nommerElement(element);
 };
 
 
@@ -483,10 +509,16 @@ onBeforeMount(async () => {
         <v-row>
           <v-col cols="12">
             <v-autocomplete v-model="classeChoisie" :items="classes" item-props="Titre" item-value="CodeClasse"
-              variant="outlined" multiple chips auto-select-first clear-on-select no-data-text="Vide..."label="Classe" />
+              variant="outlined" multiple chips auto-select-first clear-on-select no-data-text="Vide..."
+              label="Classe" />
           </v-col>
           <v-col cols="12">
-            <v-text-field variant="outlined" label="Element constitutif"></v-text-field>
+            <v-text-field variant="outlined" label="Unité d'enseignement"></v-text-field>
+          </v-col>
+          <v-col cols="12">
+            <v-autocomplete v-model="elementChoisi" :items="elements" item-props="Titre"
+              item-value="CodeElement" variant="outlined" auto-select-first no-data-text="Vide..."
+              label="Element constitutif" />
           </v-col>
           <v-col cols="12" md="8">
             <v-text-field variant="outlined" label="Enseignant"></v-text-field>
