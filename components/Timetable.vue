@@ -121,11 +121,13 @@ const niveau = ref(niveaux[indexNiveau]);
 
 const classes = ref([]);
 const elements = ref([]);
+const unites = ref([]);
 const enseignants = ref([]);
 const salles = ref([]);
 
 const classeChoisie = ref(null);
 const elementChoisi = ref(null);
+const uniteChoisie = ref(null);
 const enseignantChoisi = ref(null);
 const salleChoisie = ref(null);
 
@@ -243,7 +245,7 @@ const remplirTableItems = async (data) => {
 const initDonnees = async () => {
   /*   BDD[...] ==> edt[...]   */
   tableLoading.value = true;
-  const { edt } = await $fetch("/api/edt", {
+  const { edt_ } = await $fetch("/api/edt_", {
     method: "POST",
     body: {
       niveau: niveau.value,
@@ -252,7 +254,7 @@ const initDonnees = async () => {
     },
   });
   setTimeout(async () => {
-    await remplirTableItems(await fusionnerSimilaire(edt));
+    await remplirTableItems(await fusionnerSimilaire(edt_));
     tableLoading.value = false;
   }, 750)
 };
@@ -292,7 +294,7 @@ const nommerElement = async (data) => {
     accumulee[key] = {
       ...actuelle,
       Titre: {
-        title: (actuelle.designationelement || ""),
+        title: (actuelle.Designation || ""),
         subtitle: (actuelle.Appelation || ""),
       },
     };
@@ -302,8 +304,26 @@ const nommerElement = async (data) => {
 
   return transformerArray(elementNomme);
 };
+const nommerUnite = async (data) => {
+  /*   [Electroniques, L1] ==> [Electronique L1]   */
+  const uniteNomme = await data.reduce((accumulee, actuelle) => {
+    const key = `${actuelle.CodeUnite}`;
+
+    accumulee[key] = {
+      ...actuelle,
+      Titre: {
+        title: (actuelle.Designation || ""),
+        subtitle: (actuelle.Niveau || ""),
+      },
+    };
+
+    return accumulee;
+  }, {});
+
+  return transformerArray(uniteNomme);
+};
 const retrieveOtherData = async () => {
-  const { classe } = await $fetch("/api/classe", {
+  const { classe_ } = await $fetch("/api/classe_", {
     method: "POST",
     body: {
       niveau: niveau.value,
@@ -312,13 +332,18 @@ const retrieveOtherData = async () => {
 
   const { element } = await $fetch("/api/element", {
     method: "POST",
+  });
+
+  const { unite } = await $fetch("/api/unite", {
+    method: "POST",
     body: {
       niveau: niveau.value,
     },
   });
 
-  classes.value = await nommerClasse(classe);
+  classes.value = await nommerClasse(classe_);
   elements.value = await nommerElement(element);
+  unites.value = await nommerUnite(unite);
 };
 
 
@@ -513,10 +538,12 @@ onBeforeMount(async () => {
               label="Classe" />
           </v-col>
           <v-col cols="12">
-            <v-text-field variant="outlined" label="Unité d'enseignement"></v-text-field>
+            <v-autocomplete v-model="uniteChoisie" :items="unites" item-props="Titre"
+              item-value="CodeUnite" variant="outlined" auto-select-first no-data-text="Vide..."
+              label="Unité d'enseignement" />
           </v-col>
           <v-col cols="12">
-            <v-autocomplete v-model="elementChoisi" :items="elements" item-props="Titre"
+            <v-autocomplete :disabled="(uniteChoisie == null)" v-model="elementChoisi" :items="elements" item-props="Titre"
               item-value="CodeElement" variant="outlined" auto-select-first no-data-text="Vide..."
               label="Element constitutif" />
           </v-col>
