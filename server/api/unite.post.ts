@@ -5,8 +5,9 @@ export default eventHandler(async (event) => {
     const body = await readBody(event);
 
     const { data } = await supabase
-        .from("ElementConst")
+        .from("UniteEns")
         .select("*")
+        .eq("Niveau", body.niveau);
     
-    return { element: data };
+    return { unite: data };
 });
