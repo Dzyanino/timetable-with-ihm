@@ -404,6 +404,15 @@ const afficherEditerDialog = (jour, heure, numero) => {
   const choosen = tableItems.value[0].jours[joursSemaine[new Date(jour).getDay() - 1]][heure][0].filter((ele) => {
     return comparerArray(ele.AllNumeroEdt, numero);
   });
+  
+  const element = elements.value.filter((ele) => ele.CodeElement == choosen[0].CodeElement);
+  const unite = unites.value.filter((uni) => uni.CodeUnite == element[0].CodeUnite);
+
+  classeChoisie.value = choosen[0].Classe;
+  uniteChoisie.value = unite[0].CodeUnite;
+  elementChoisi.value = element[0].CodeElement;                          
+  enseignantChoisi.value = choosen[0].IdEnseignant;
+  salleChoisie.value = choosen[0].NumeroSalle;
 
   editerDialog.value = !editerDialog.value
 }
