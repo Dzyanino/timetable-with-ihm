@@ -120,6 +120,7 @@ let indexNiveau = 0;
 const niveau = ref(niveaux[indexNiveau]);
 
 const classes = ref([]);
+const elementsNonFiltres = ref([]);
 const elements = ref([]);
 const unites = ref([]);
 const enseignants = ref([]);
@@ -372,7 +373,7 @@ const retrieveOtherData = async () => {
 
   classes.value = await nommerClasse(classe_);
   unites.value = await nommerUnite(unite);
-  elements.value = await nommerElement(element);
+  elementsNonFiltres.value = await nommerElement(element);
   enseignants.value = await nommerEnseignant(enseignant);
   salles.value = salle;
 };
@@ -403,22 +404,30 @@ const changerSemaine = async (sens) => {
   await retrieveMainData();
 };
 
+
+const varierElement = () => {
+  elements.value = elementsNonFiltres.value.filter((ele) => {
+    return uniteChoisie.value == ele.CodeUnite;
+  });
+};
 const afficherEditerDialog = (jour, heure, numero) => {
   const choosen = tableItems.value[0].jours[joursSemaine[new Date(jour).getDay() - 1]][heure][0].filter((ele) => {
     return comparerArray(ele.AllNumeroEdt, numero);
   });
 
-  const element = elements.value.filter((ele) => ele.CodeElement == choosen[0].CodeElement);
+  const element = elementsNonFiltres.value.filter((ele) => ele.CodeElement == choosen[0].CodeElement);
   const unite = unites.value.filter((uni) => uni.CodeUnite == element[0].CodeUnite);
 
-  classeChoisie.value = choosen[0].CodesClasses;
   uniteChoisie.value = unite[0].CodeUnite;
+  varierElement();
+
+  classeChoisie.value = choosen[0].CodesClasses;
   elementChoisi.value = element[0].CodeElement;
   enseignantChoisi.value = choosen[0].IdEnseignant;
   salleChoisie.value = choosen[0].NumeroSalle;
 
   editerDialog.value = !editerDialog.value;
-}
+};
 // MADE FONCTIONS -----------------------------------------------------------------------------------
 
 
@@ -579,7 +588,8 @@ onBeforeMount(async () => {
           </v-col>
           <v-col cols="12">
             <v-autocomplete v-model="uniteChoisie" :items="unites" item-props="Titre" item-value="CodeUnite"
-              variant="outlined" auto-select-first no-data-text="Vide..." label="Unité d'enseignement" />
+              variant="outlined" auto-select-first no-data-text="Vide..." label="Unité d'enseignement"
+              @click="elementChoisi = null" @update:model-value="varierElement" />
           </v-col>
           <v-col cols="12">
             <v-autocomplete :disabled="(uniteChoisie == null)" v-model="elementChoisi" :items="elements"
