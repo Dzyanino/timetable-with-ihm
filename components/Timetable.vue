@@ -188,6 +188,7 @@ const fusionnerSimilaire = async (data) => {
       accumulee[key] = {
         AllNumeroEdt: [actuelle.NumeroEdt],
         ...actuelle,
+        CodesClasses: [actuelle.CodeClasse],
         Classe: [
           (actuelle.appelationparcours || "") + ((!!actuelle.appelationparcours && !!actuelle.CodeGroupe) ? " " : "") + (actuelle.CodeGroupe || ""),
         ],
@@ -197,6 +198,7 @@ const fusionnerSimilaire = async (data) => {
         donneesExistantes.NumeroEdt,
         actuelle.NumeroEdt,
       ];
+      donneesExistantes.CodesClasses = [donneesExistantes.CodeClasse, actuelle.CodeClasse];
       donneesExistantes.Classe[donneesExistantes.Classe.length - 1] =
         donneesExistantes.Classe[donneesExistantes.Classe.length - 1] +
         "/" +
@@ -205,6 +207,7 @@ const fusionnerSimilaire = async (data) => {
       accumulee[key] = {
         AllNumeroEdt: [donneesExistantes.NumeroEdt, actuelle.NumeroEdt],
         ...actuelle,
+        CodesClasses: [donneesExistantes.CodeClasse, actuelle.CodeClasse],
         Classe: [
           (donneesExistantes.appelationparcours || "") + ((!!donneesExistantes.appelationparcours && !!donneesExistantes.CodeGroupe) ? " " : "") + (donneesExistantes.CodeGroupe || ""),
           (actuelle.appelationparcours || "") + ((!!actuelle.appelationparcours && !!actuelle.CodeGroupe) ? " " : "") + (actuelle.CodeGroupe || ""),
@@ -404,17 +407,17 @@ const afficherEditerDialog = (jour, heure, numero) => {
   const choosen = tableItems.value[0].jours[joursSemaine[new Date(jour).getDay() - 1]][heure][0].filter((ele) => {
     return comparerArray(ele.AllNumeroEdt, numero);
   });
-  
+
   const element = elements.value.filter((ele) => ele.CodeElement == choosen[0].CodeElement);
   const unite = unites.value.filter((uni) => uni.CodeUnite == element[0].CodeUnite);
 
-  classeChoisie.value = choosen[0].Classe;
+  classeChoisie.value = choosen[0].CodesClasses;
   uniteChoisie.value = unite[0].CodeUnite;
-  elementChoisi.value = element[0].CodeElement;                          
+  elementChoisi.value = element[0].CodeElement;
   enseignantChoisi.value = choosen[0].IdEnseignant;
   salleChoisie.value = choosen[0].NumeroSalle;
 
-  editerDialog.value = !editerDialog.value
+  editerDialog.value = !editerDialog.value;
 }
 // MADE FONCTIONS -----------------------------------------------------------------------------------
 
