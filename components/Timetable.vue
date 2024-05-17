@@ -126,6 +126,7 @@ const unites = ref([]);
 const enseignants = ref([]);
 const salles = ref([]);
 
+const edtChoisi = ref(null);
 const classeChoisie = ref(null);
 const elementChoisi = ref(null);
 const uniteChoisie = ref(null);
@@ -421,6 +422,7 @@ const afficherEditerDialog = (jour, heure, numero) => {
   uniteChoisie.value = unite[0].CodeUnite;
   varierElement();
 
+  edtChoisi.value = choosen[0].AllNumeroEdt;
   classeChoisie.value = choosen[0].CodesClasses;
   elementChoisi.value = element[0].CodeElement;
   enseignantChoisi.value = choosen[0].IdEnseignant;
@@ -428,6 +430,20 @@ const afficherEditerDialog = (jour, heure, numero) => {
 
   editerDialog.value = !editerDialog.value;
 };
+
+const editerEdt = async () => {
+  const test = await $fetch("/api/actions/edit_edt", {
+    method: "POST",
+    body: {
+      numero: edtChoisi.value,
+      classe: classeChoisie.value,
+      element: elementChoisi.value,
+      enseignant: enseignantChoisi.value,
+      salle: salleChoisie.value,
+    }
+  });
+  console.log(test);
+}
 // MADE FONCTIONS -----------------------------------------------------------------------------------
 
 
@@ -521,11 +537,11 @@ onBeforeMount(async () => {
 
               <template v-for="jour in joursSemaine" :key="jour">
                 <td class="border-s bg-grey-lighten-5 pa-0">
-                  <div class="d-flex flex-row align-center justify-space-evenly empty-cell-width">
+                  <div class="d-flex flex-row align-stretch justify-space-evenly empty-cell-width">
                     <ClientOnly>
                       <template v-if="item.jours[jour][index + 1][0].length > 0">
                         <template v-for="horaire in item.jours[jour][index + 1][0]" :key="horaire.NumeroEdt">
-                          <v-card hover flat class="flex-grow-1 rounded-0"
+                          <v-card hover flat class="flex-grow-1 rounded-0" height="100%"
                             @click="afficherEditerDialog(horaire.Date, horaire.Horaire, horaire.AllNumeroEdt)">
                             <v-card-title class="d-flex align-center justify-center text-body-1 font-weight-light">
                               <template v-for="(classe, occ) in horaire.Classe" :key="occ">
@@ -608,7 +624,7 @@ onBeforeMount(async () => {
       </v-card-text>
       <v-card-actions class="d-flex justify-end">
         <v-btn @click="editerDialog = !editerDialog">fermer</v-btn>
-        <v-btn>ok</v-btn>
+        <v-btn @click="editerEdt">ok</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
