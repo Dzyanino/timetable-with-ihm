@@ -434,7 +434,7 @@ const afficherEditerDialog = (jour, heure, numero) => {
 };
 
 const editerEdt = async () => {
-  const test = await $fetch("/api/actions/edit_edt", {
+  const editer = await $fetch("/api/actions/edit_edt", {
     method: "POST",
     body: {
       numero: edtChoisi.value,
@@ -442,9 +442,10 @@ const editerEdt = async () => {
       element: elementChoisi.value,
       enseignant: enseignantChoisi.value,
       salle: salleChoisie.value,
+      date: dateChoisie.value,
     }
   });
-  console.log(test);
+  console.log(editer);
 }
 // MADE FONCTIONS -----------------------------------------------------------------------------------
 
