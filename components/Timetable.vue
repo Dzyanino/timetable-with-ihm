@@ -132,6 +132,7 @@ const elementChoisi = ref(null);
 const uniteChoisie = ref(null);
 const enseignantChoisi = ref(null);
 const salleChoisie = ref(null);
+const dateChoisie = ref(null);
 
 const tableLoading = ref(false);
 // const datePickerMenu = ref(false);
@@ -427,6 +428,7 @@ const afficherEditerDialog = (jour, heure, numero) => {
   elementChoisi.value = element[0].CodeElement;
   enseignantChoisi.value = choosen[0].IdEnseignant;
   salleChoisie.value = choosen[0].NumeroSalle;
+  dateChoisie.value = new Date(choosen[0].Date);
 
   editerDialog.value = !editerDialog.value;
 };
@@ -597,10 +599,13 @@ onBeforeMount(async () => {
       </v-card-title>
       <v-card-text>
         <v-row>
-          <v-col cols="12">
+          <v-col cols="12" md="5">
             <v-autocomplete v-model="classeChoisie" :items="classes" item-props="Titre" item-value="CodeClasse"
               variant="outlined" multiple chips auto-select-first clear-on-select no-data-text="Vide..."
               label="Classe" />
+          </v-col>
+          <v-col cols="12" md="7">
+            <v-date-picker v-model="dateChoisie" :landscape="true" :reactive="true"></v-date-picker>
           </v-col>
           <v-col cols="12">
             <v-autocomplete v-model="uniteChoisie" :items="unites" item-props="Titre" item-value="CodeUnite"
