@@ -17,5 +17,8 @@
     "vue": "^3.4.21",
     "vue-router": "^4.3.0",
     "vuetify-nuxt-module": "^0.14.1"
+  },
+  "devDependencies": {
+    "nuxt-lodash": "^2.5.3"
   }
 }
