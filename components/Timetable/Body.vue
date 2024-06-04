@@ -112,9 +112,6 @@ const dateActuelle = ref(new Date());
 const debutSemaine = ref(null);
 const finSemaine = ref(null);
 
-const debutLisible = ref("-");
-const finLisible = ref("-");
-
 const niveaux = ["L1", "L2", "L3", "M1", "M2"];
 let indexNiveau = 0;
 const niveau = ref(niveaux[indexNiveau]);
@@ -157,11 +154,7 @@ const transformerArray = (data) => {
 };
 
 
-const dateLisible = (date) => {
-  /*   DD MMMM   */
-  const options = { month: "long", day: "numeric" };//year: "numeric", 
-  return date.toLocaleString("fr-FR", options);
-};
+
 const formatterDate = (date) => {
   /*   YYYY-MM-DD  */
   const annee = date.getFullYear();
@@ -268,9 +261,6 @@ const initDonnees = async () => {
 const retrieveMainData = async () => {
   /*   Retrieve EDT   */
   prendreSemaine(dateActuelle.value);
-  debutLisible.value = dateLisible(debutSemaine.value);
-  finLisible.value = dateLisible(finSemaine.value);
-
   await initDonnees();
 }
 
@@ -466,48 +456,12 @@ onBeforeMount(async () => {
 
 <template>
   <div>
-    <v-row class="bg-white border rounded-lg mx-auto">
+    <TimetableTopMenu :indexNiveau="indexNiveau" :niveauxLength="niveaux.length" :niveau="niveau"
+      :debutSemaine="debutSemaine" :finSemaine="finSemaine" @niveauMoins="changerNiveau('moins')"
+      @niveauPlus="changerNiveau('plus')" @semaineMoins="changerSemaine('moins')"
+      @semainePlus="changerSemaine('plus')" />
 
-      <v-col cols="12" sm="2"
-        class="text-center text-overline text-md-button d-flex flex-row align-center justify-space-around">
-        <v-btn variant="text" icon="mdi-chevron-left" :disabled="indexNiveau == 0" @click="changerNiveau('moins')" />
-        <h2 class="flex-grow-1">{{ niveau }}</h2>
-        <v-btn variant="text" icon="mdi-chevron-right" :disabled="indexNiveau == (niveaux.length - 1)"
-          @click="changerNiveau('plus')" />
-      </v-col>
-
-      <v-col cols="12" sm="7" class="d-flex flex-row align-center justify-space-around">
-        <v-btn variant="text" icon="mdi-chevron-left" @click="changerSemaine('moins')" />
-        <ClientOnly>
-          <div
-            class="flex-grow-1 text-center text-overline text-md-button d-flex flex-column flex-md-row align-center justify-space-evenly">
-            <h2>
-              {{ debutLisible }}
-              <span v-if="debutSemaine.getFullYear() != finSemaine.getFullYear()">
-                {{ " " + debutSemaine.getFullYear() }}
-              </span>
-            </h2>
-            <h2>-</h2>
-            <h2>{{ finLisible }}<span>{{ " " + finSemaine.getFullYear() }}</span></h2>
-          </div>
-        </ClientOnly>
-        <v-btn variant="text" icon="mdi-chevron-right" @click="changerSemaine('plus')" />
-      </v-col>
-
-      <!-- <v-col cols="12" sm="2">
-        <v-select model-value="dateActuelle" density="compact" variant="outlined" density="default" @click="datePickerMenu = !datePickerMenu">
-        </v-select>
-        <v-menu v-model="datePickerMenu" class="align-center justify-center">
-          <v-date-picker v-model="dateActuelle"></v-date-picker>
-        </v-menu>
-      </v-col> -->
-      <v-col cols="12" sm="1">
-        <v-btn color="success">Ajouter</v-btn>
-      </v-col>
-
-    </v-row>
-
-    <v-row>
+    <!-- <v-row>
       <v-col cols="12">
         <v-data-table :loading="tableLoading" loading-text="aksdjfjaklsdjf" :headers="tableHeaders" :items="tableItems"
           class="border-t border-e border-b rounded mb-4" color="green">
@@ -520,16 +474,16 @@ onBeforeMount(async () => {
                     {{ column.title }}
                   </td>
                 </template>
-                <template v-else>
+<template v-else>
                   <td class="border-s border-b text-center text-overline" width="250px">
                     <span>{{ column.title }}</span>
                   </td>
                 </template>
-              </template>
-            </tr>
-          </template>
+</template>
+</tr>
+</template>
 
-          <template v-slot:item="{ item }">
+<template v-slot:item="{ item }">
             <tr v-for="(heure, index) in item.heures" :key="index">
 
               <td class="border-s px-1">
@@ -553,35 +507,35 @@ onBeforeMount(async () => {
                                 <template v-if="occ == 0">
                                   <span>{{ classe }}</span>
                                 </template>
-                                <template v-else>
+<template v-else>
                                   <span>-</span>
                                   <span>{{ classe }}</span>
                                 </template>
-                              </template>
-                            </v-card-title>
+</template>
+</v-card-title>
 
-                            <v-card-text class="d-flex flex-column align-center justify-center text-wrap">
-                              <span class="text-center text-uppercase font-weight-bold">
-                                {{ horaire.appelationelement }}
-                              </span>
-                              <span>{{ horaire.appelationenseignant }}</span>
-                              <span>{{ horaire.NumeroSalle }}</span>
-                            </v-card-text>
-                          </v-card>
-                        </template>
-                      </template>
-                      <template v-else>
+<v-card-text class="d-flex flex-column align-center justify-center text-wrap">
+  <span class="text-center text-uppercase font-weight-bold">
+    {{ horaire.appelationelement }}
+  </span>
+  <span>{{ horaire.appelationenseignant }}</span>
+  <span>{{ horaire.NumeroSalle }}</span>
+</v-card-text>
+</v-card>
+</template>
+</template>
+<template v-else>
                         <div class="empty-cell-width"></div>
                       </template>
-                    </ClientOnly>
-                  </div>
-                </td>
-              </template>
+</ClientOnly>
+</div>
+</td>
+</template>
 
-            </tr>
-          </template>
+</tr>
+</template>
 
-          <template v-slot:loading>
+<template v-slot:loading>
             <v-row>
               <v-col cols="12" class="text-center">
                 <span class="text-subtitle-1">Veuillez patienter...</span>
@@ -589,77 +543,15 @@ onBeforeMount(async () => {
             </v-row>
           </template>
 
-          <template v-slot:bottom></template>
-        </v-data-table>
-      </v-col>
-    </v-row>
+<template v-slot:bottom></template>
+</v-data-table>
+</v-col>
+</v-row> -->
   </div>
 
-  <v-dialog v-model="editerDialog" persistent max-width="750px" transition="scroll-y-reverse-transition">
-    <v-card>
-      <v-card-title class="text-button">
-        <h3>Editer</h3>
-      </v-card-title>
-      <v-card-text>
-        <v-row>
-          <v-col cols="12" md="5">
-            <v-autocomplete v-model="classeChoisie" :items="classes" item-props="Titre" item-value="CodeClasse"
-              variant="outlined" density="default" multiple chips auto-select-first clear-on-select
-              no-data-text="Vide..." label="Classe" />
-          </v-col>
-          <v-col cols="12" md="7">
-            <!-- <v-text-field label="Date" type="date"></v-text-field> -->
-            <v-menu :close-on-content-click="false" transition="scale-transition" lazy offset-y>
-              <template v-slot:activator="{ props }">
-                <!-- <v-text-field v-model="dateChoisie" variant="outlined" density="default"
-                  append-inner-icon="mdi-calendar" no-title readonly></v-text-field> -->
-                <v-btn color="success" v-bind="props">text</v-btn>
-              </template>
-              <v-date-picker v-model="dateChoisieFull"></v-date-picker>
-            </v-menu>
-          </v-col>
-          <v-col cols="12">
-            <v-autocomplete v-model="uniteChoisie" :items="unites" item-props="Titre" item-value="CodeUnite"
-              variant="outlined" density="default" auto-select-first no-data-text="Vide..." label="Unité d'enseignement"
-              @click="elementChoisi = null" @update:model-value="varierElement" />
-          </v-col>
-          <v-col cols="12">
-            <v-autocomplete :disabled="(uniteChoisie == null)" v-model="elementChoisi" :items="elements"
-              item-props="Titre" item-value="CodeElement" variant="outlined" density="default" auto-select-first
-              no-data-text="Vide..." label="Element constitutif" />
-          </v-col>
-          <v-col cols="12" md="8">
-            <v-autocomplete v-model="enseignantChoisi" :items="enseignants" item-props="Titre" item-value="IdEnseignant"
-              variant="outlined" density="default" auto-select-first no-data-text="Vide..." label="Enseignant" />
-          </v-col>
-          <v-col cols="12" md="4">
-            <v-autocomplete v-model="salleChoisie" :items="salles" item-title="NumeroSalle" item-value="NumeroSalle"
-              variant="outlined" density="default" auto-select-first no-data-text="Vide..." label="Salle" />
-          </v-col>
-        </v-row>
-      </v-card-text>
-      <v-card-actions class="d-flex justify-end">
-        <v-btn @click="editerDialog = !editerDialog">fermer</v-btn>
-        <v-btn @click="editerEdt">ok</v-btn>
-      </v-card-actions>
-    </v-card>
-  </v-dialog>
+  <!-- <TimetableDialogEdit />
 
-  <v-dialog v-model="ajouterDialog" persistent max-width="750px" transition="scroll-y-reverse-transition">
-    <v-card>
-      <v-card-title class="text-button">
-        <h3>Ajouter</h3>
-      </v-card-title>
-      <v-card-text>
-        <v-text-field label="test ajout"></v-text-field>
-        <v-text-field label="jour"></v-text-field>
-      </v-card-text>
-      <v-card-actions class="d-flex justify-end">
-        <v-btn @click="ajouterDialog = !ajouterDialog">fermer</v-btn>
-        <v-btn>ok</v-btn>
-      </v-card-actions>
-    </v-card>
-  </v-dialog>
+  <TimetableDialogAjout /> -->
 </template>
 
 <style>
