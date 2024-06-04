@@ -133,6 +133,7 @@ const uniteChoisie = ref(null);
 const enseignantChoisi = ref(null);
 const salleChoisie = ref(null);
 const dateChoisie = ref(null);
+const dateChoisieFull = ref(null);
 
 const tableLoading = ref(false);
 // const datePickerMenu = ref(false);
@@ -428,7 +429,8 @@ const afficherEditerDialog = (jour, heure, numero) => {
   elementChoisi.value = element[0].CodeElement;
   enseignantChoisi.value = choosen[0].IdEnseignant;
   salleChoisie.value = choosen[0].NumeroSalle;
-  dateChoisie.value = new Date(choosen[0].Date);
+  dateChoisie.value = choosen[0].Date
+  dateChoisieFull.value = new Date(dateChoisie.value);
 
   editerDialog.value = !editerDialog.value;
 };
@@ -442,7 +444,7 @@ const editerEdt = async () => {
       element: elementChoisi.value,
       enseignant: enseignantChoisi.value,
       salle: salleChoisie.value,
-      date: dateChoisie.value,
+      date: dateChoisieFull.value,
     }
   });
   console.log(editer);
@@ -493,7 +495,7 @@ onBeforeMount(async () => {
       </v-col>
 
       <!-- <v-col cols="12" sm="2">
-        <v-select model-value="dateActuelle" density="compact" variant="outlined" @click="datePickerMenu = !datePickerMenu">
+        <v-select model-value="dateActuelle" density="compact" variant="outlined" density="default" @click="datePickerMenu = !datePickerMenu">
         </v-select>
         <v-menu v-model="datePickerMenu" class="align-center justify-center">
           <v-date-picker v-model="dateActuelle"></v-date-picker>
@@ -544,7 +546,7 @@ onBeforeMount(async () => {
                     <ClientOnly>
                       <template v-if="item.jours[jour][index + 1][0].length > 0">
                         <template v-for="horaire in item.jours[jour][index + 1][0]" :key="horaire.NumeroEdt">
-                          <v-card hover flat class="flex-grow-1 rounded-0" height="100%"
+                          <v-card hover flat class="flex-grow-1 rounded-0"
                             @click="afficherEditerDialog(horaire.Date, horaire.Horaire, horaire.AllNumeroEdt)">
                             <v-card-title class="d-flex align-center justify-center text-body-1 font-weight-light">
                               <template v-for="(classe, occ) in horaire.Classe" :key="occ">
@@ -602,29 +604,37 @@ onBeforeMount(async () => {
         <v-row>
           <v-col cols="12" md="5">
             <v-autocomplete v-model="classeChoisie" :items="classes" item-props="Titre" item-value="CodeClasse"
-              variant="outlined" multiple chips auto-select-first clear-on-select no-data-text="Vide..."
-              label="Classe" />
+              variant="outlined" density="default" multiple chips auto-select-first clear-on-select
+              no-data-text="Vide..." label="Classe" />
           </v-col>
           <v-col cols="12" md="7">
-            <v-date-picker v-model="dateChoisie" :landscape="true" :reactive="true"></v-date-picker>
+            <!-- <v-text-field label="Date" type="date"></v-text-field> -->
+            <v-menu :close-on-content-click="false" transition="scale-transition" lazy offset-y>
+              <template v-slot:activator="{ props }">
+                <!-- <v-text-field v-model="dateChoisie" variant="outlined" density="default"
+                  append-inner-icon="mdi-calendar" no-title readonly></v-text-field> -->
+                <v-btn color="success" v-bind="props">text</v-btn>
+              </template>
+              <v-date-picker v-model="dateChoisieFull"></v-date-picker>
+            </v-menu>
           </v-col>
           <v-col cols="12">
             <v-autocomplete v-model="uniteChoisie" :items="unites" item-props="Titre" item-value="CodeUnite"
-              variant="outlined" auto-select-first no-data-text="Vide..." label="Unité d'enseignement"
+              variant="outlined" density="default" auto-select-first no-data-text="Vide..." label="Unité d'enseignement"
               @click="elementChoisi = null" @update:model-value="varierElement" />
           </v-col>
           <v-col cols="12">
             <v-autocomplete :disabled="(uniteChoisie == null)" v-model="elementChoisi" :items="elements"
-              item-props="Titre" item-value="CodeElement" variant="outlined" auto-select-first no-data-text="Vide..."
-              label="Element constitutif" />
+              item-props="Titre" item-value="CodeElement" variant="outlined" density="default" auto-select-first
+              no-data-text="Vide..." label="Element constitutif" />
           </v-col>
           <v-col cols="12" md="8">
             <v-autocomplete v-model="enseignantChoisi" :items="enseignants" item-props="Titre" item-value="IdEnseignant"
-              variant="outlined" auto-select-first no-data-text="Vide..." label="Enseignant" />
+              variant="outlined" density="default" auto-select-first no-data-text="Vide..." label="Enseignant" />
           </v-col>
           <v-col cols="12" md="4">
             <v-autocomplete v-model="salleChoisie" :items="salles" item-title="NumeroSalle" item-value="NumeroSalle"
-              variant="outlined" auto-select-first no-data-text="Vide..." label="Salle" />
+              variant="outlined" density="default" auto-select-first no-data-text="Vide..." label="Salle" />
           </v-col>
         </v-row>
       </v-card-text>
