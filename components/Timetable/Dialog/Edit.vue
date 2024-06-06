@@ -1,9 +1,28 @@
 <script setup>
+const propss = defineProps({
+    modelValue: {
+        type: Boolean,
+        required: true,
+        default: false
+    },
+    choosed: {
+        type: Object,
+        required: true
+    },
+    allData: {
+        type: Object,
+        required: true,
+    }
+});
+
+const menu = ref(false);
+const formattedDate = computed(() => {
+    return propss.choosed.dateChoisieFull ? propss.choosed.dateChoisieFull.toLocaleDateString("fr") : "";
+});
 </script>
 
-ScriptCompileContext
 <template>
-    <v-dialog v-model="editerDialog" persistent max-width="750px" transition="scroll-y-reverse-transition">
+    <v-dialog :model-value="modelValue" persistent max-width="750px" transition="scroll-y-reverse-transition">
         <v-card>
             <v-card-title class="text-button">
                 <h3>Editer</h3>
@@ -11,47 +30,51 @@ ScriptCompileContext
             <v-card-text>
                 <v-row>
                     <v-col cols="12" md="5">
-                        <v-autocomplete v-model="classeChoisie" :items="classes" item-props="Titre"
-                            item-value="CodeClasse" variant="outlined" density="default" multiple chips
-                            auto-select-first clear-on-select no-data-text="Vide..." label="Classe" />
+                        <v-autocomplete v-model="choosed.classeChoisie" :items="allData.classes" item-props="Titre"
+                            item-value="CodeClasse" variant="outlined" density="default" no-data-text="Vide..."
+                            label="Classe" multiple chips auto-select-first clear-on-select />
                     </v-col>
                     <v-col cols="12" md="7">
-                        <!-- <v-text-field label="Date" type="date"></v-text-field> -->
-                        <v-menu :close-on-content-click="false" transition="scale-transition" lazy offset-y>
+                        <v-menu v-model="menu" :close-on-content-click="false" transition="scale-transition" lazy
+                            offset-y>
                             <template v-slot:activator="{ props }">
-                                <v-text-field v-model="dateChoisie" variant="outlined" density="default"
-                                    append-inner-icon="mdi-calendar" no-title hide-details readonly
-                                    v-bind="props"></v-text-field>
+                                <v-text-field v-model="formattedDate" variant="outlined" density="default"
+                                    append-inner-icon="mdi-calendar" v-bind="props" no-title hide-details readonly />
                             </template>
-                            <v-date-picker first-day-of-week="1" v-model="dateChoisieFull"></v-date-picker>
+                            <v-date-picker title="Choisissez une date" first-day-of-week="1"
+                                v-model="choosed.dateChoisieFull">
+                                <template v-slot:actions>
+                                    <v-btn @click="menu = !menu">Fermer</v-btn>
+                                </template>
+                            </v-date-picker>
                         </v-menu>
                     </v-col>
                     <v-col cols="12">
-                        <v-autocomplete v-model="uniteChoisie" :items="unites" item-props="Titre" item-value="CodeUnite"
-                            variant="outlined" density="default" auto-select-first no-data-text="Vide..."
-                            label="Unité d'enseignement" @click="elementChoisi = null"
-                            @update:model-value="varierElement" />
+                        <v-autocomplete v-model="choosed.uniteChoisie" :items="allData.unites" item-props="Titre"
+                            item-value="CodeUnite" variant="outlined" density="default" no-data-text="Vide..."
+                            label="Unité d'enseignement" @update:modelValue="$emit('vider-element')"
+                            @update:model-value="$emit('varier-element')" auto-select-first />
                     </v-col>
                     <v-col cols="12">
-                        <v-autocomplete :disabled="(uniteChoisie == null)" v-model="elementChoisi" :items="elements"
-                            item-props="Titre" item-value="CodeElement" variant="outlined" density="default"
-                            auto-select-first no-data-text="Vide..." label="Element constitutif" />
+                        <v-autocomplete :disabled="(choosed.uniteChoisie == null)" v-model="choosed.elementChoisi"
+                            :items="allData.elements" item-props="Titre" item-value="CodeElement" variant="outlined"
+                            density="default" auto-select-first no-data-text="Vide..." label="Element constitutif" />
                     </v-col>
                     <v-col cols="12" md="8">
-                        <v-autocomplete v-model="enseignantChoisi" :items="enseignants" item-props="Titre"
-                            item-value="IdEnseignant" variant="outlined" density="default" auto-select-first
-                            no-data-text="Vide..." label="Enseignant" />
+                        <v-autocomplete v-model="choosed.enseignantChoisi" :items="allData.enseignants"
+                            item-props="Titre" item-value="IdEnseignant" variant="outlined" density="default"
+                            auto-select-first no-data-text="Vide..." label="Enseignant" />
                     </v-col>
                     <v-col cols="12" md="4">
-                        <v-autocomplete v-model="salleChoisie" :items="salles" item-title="NumeroSalle"
+                        <v-autocomplete v-model="choosed.salleChoisie" :items="allData.salles" item-title="NumeroSalle"
                             item-value="NumeroSalle" variant="outlined" density="default" auto-select-first
                             no-data-text="Vide..." label="Salle" />
                     </v-col>
                 </v-row>
             </v-card-text>
             <v-card-actions class="d-flex justify-end">
-                <v-btn @click="editerDialog = !editerDialog">fermer</v-btn>
-                <v-btn @click="editerEdt">ok</v-btn>
+                <v-btn @click="$emit('close-dialog')">fermer</v-btn>
+                <v-btn @click="$emit('editer-edt')">ok</v-btn>
             </v-card-actions>
         </v-card>
     </v-dialog>

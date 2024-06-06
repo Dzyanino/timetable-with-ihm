@@ -107,35 +107,42 @@ const tableItems = ref([
   },
 ]);
 
-const joursSemaine = ["lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi"];
-const dateActuelle = ref(new Date());
-const debutSemaine = ref(null);
-const finSemaine = ref(null);
+const journaux = ref({
+  joursSemaine: ["lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi"],
+  dateActuelle: new Date(),
+  debutSemaine: null,
+  finSemaine: null,
+  debutLisible: "-",
+  finLisible: "-",
+})
 
-const niveaux = ["L1", "L2", "L3", "M1", "M2"];
 let indexNiveau = 0;
+const niveaux = ["L1", "L2", "L3", "M1", "M2"];
 const niveau = ref(niveaux[indexNiveau]);
 
-const classes = ref([]);
 const elementsNonFiltres = ref([]);
-const elements = ref([]);
-const unites = ref([]);
-const enseignants = ref([]);
-const salles = ref([]);
+const allData = ref({
+  classes: [],
+  elements: [],
+  unites: [],
+  enseignants: [],
+  salles: [],
+});
 
 const edtChoisi = ref(null);
-const classeChoisie = ref(null);
-const elementChoisi = ref(null);
-const uniteChoisie = ref(null);
-const enseignantChoisi = ref(null);
-const salleChoisie = ref(null);
-const dateChoisie = ref(null);
-const dateChoisieFull = ref(null);
+const choosenOne = ref({
+  classeChoisie: null,
+  elementChoisi: null,
+  uniteChoisie: null,
+  enseignantChoisi: null,
+  salleChoisie: null,
+  dateChoisie: null,
+  dateChoisieFull: null,
+})
 
-const tableLoading = ref(false);
-// const datePickerMenu = ref(false);
+const tableLoading = ref(true);
 const editerDialog = ref(false);
-const ajouterDialog = ref(false);
+// const ajouterDialog = ref(false);
 // CONSTANTES ----------------------------------------------------------------------------------
 
 
@@ -153,8 +160,6 @@ const transformerArray = (data) => {
   return tableau;
 };
 
-
-
 const formatterDate = (date) => {
   /*   YYYY-MM-DD  */
   const annee = date.getFullYear();
@@ -167,11 +172,19 @@ const prendreSemaine = (actualDate) => {
   /* XX XXXX - XX XXXX */
   const numeroJour = ref(actualDate.getDay());
 
-  debutSemaine.value = new Date(actualDate);
-  debutSemaine.value.setDate(actualDate.getDate() - numeroJour.value + 1);
+  journaux.value.debutSemaine = new Date(actualDate);
+  journaux.value.debutSemaine.setDate(actualDate.getDate() - numeroJour.value + 1);
 
-  finSemaine.value = new Date(actualDate);
-  finSemaine.value.setDate(actualDate.getDate() + (6 - numeroJour.value));
+  journaux.value.finSemaine = new Date(actualDate);
+  journaux.value.finSemaine.setDate(actualDate.getDate() + (6 - numeroJour.value));
+};
+const dateLisible = (date) => {
+  /*   DD MMMM   */
+  if (!!date) {
+    const options = { month: "long", day: "numeric" };//year: "numeric", 
+    return date.toLocaleString("fr-FR", options);
+  }
+  else return 'DD MMMM';
 };
 
 
@@ -242,25 +255,29 @@ const remplirTableItems = async (data) => {
   }
   // console.log(tableItems.value[0].jours);
 };
-const initDonnees = async () => {
+const initDonnees = useDebounce(async () => {
   /*   BDD[...] ==> edt[...]   */
   tableLoading.value = true;
   const { edt_ } = await $fetch("/api/edt_", {
     method: "POST",
     body: {
       niveau: niveau.value,
-      debutSemaine: formatterDate(debutSemaine.value),
-      finSemaine: formatterDate(finSemaine.value),
+      debutSemaine: formatterDate(journaux.value.debutSemaine),
+      finSemaine: formatterDate(journaux.value.finSemaine),
     },
   });
+  console.log(edt_);
+
   setTimeout(async () => {
     await remplirTableItems(await fusionnerSimilaire(edt_));
     tableLoading.value = false;
-  }, 750)
-};
+  }, 750);
+}, 1000);
 const retrieveMainData = async () => {
   /*   Retrieve EDT   */
-  prendreSemaine(dateActuelle.value);
+  prendreSemaine(journaux.value.dateActuelle);
+  journaux.value.debutLisible = dateLisible(journaux.value.debutSemaine);
+  journaux.value.finLisible = dateLisible(journaux.value.finSemaine);
   await initDonnees();
 }
 
@@ -337,7 +354,7 @@ const nommerEnseignant = async (data) => {
 
   return transformerArray(enseignantNomme);
 };
-const retrieveOtherData = async () => {
+const retrieveOtherData = useDebounce(async () => {
   const { classe_ } = await $fetch("/api/classe_", {
     method: "POST",
     body: {
@@ -364,12 +381,12 @@ const retrieveOtherData = async () => {
     method: "POST",
   });
 
-  classes.value = await nommerClasse(classe_);
-  unites.value = await nommerUnite(unite);
+  allData.value.classes = await nommerClasse(classe_);
+  allData.value.unites = await nommerUnite(unite);
   elementsNonFiltres.value = await nommerElement(element);
-  enseignants.value = await nommerEnseignant(enseignant);
-  salles.value = salle;
-};
+  allData.value.enseignants = await nommerEnseignant(enseignant);
+  allData.value.salles = salle;
+}, 500);
 
 
 const changerNiveau = async (sens) => {
@@ -389,38 +406,38 @@ const changerNiveau = async (sens) => {
 const changerSemaine = async (sens) => {
   /* dateActuelle +/- 7  */
   if (sens == "plus") {
-    dateActuelle.value.setDate(dateActuelle.value.getDate() + 7);
+    journaux.value.dateActuelle.setDate(journaux.value.dateActuelle.getDate() + 7);
   }
   else if (sens == "moins") {
-    dateActuelle.value.setDate(dateActuelle.value.getDate() - 7);
+    journaux.value.dateActuelle.setDate(journaux.value.dateActuelle.getDate() - 7);
   }
   await retrieveMainData();
 };
 
 
 const varierElement = () => {
-  elements.value = elementsNonFiltres.value.filter((ele) => {
-    return uniteChoisie.value == ele.CodeUnite;
+  allData.value.elements = elementsNonFiltres.value.filter((ele) => {
+    return choosenOne.value.uniteChoisie == ele.CodeUnite;
   });
 };
 const afficherEditerDialog = (jour, heure, numero) => {
-  const choosen = tableItems.value[0].jours[joursSemaine[new Date(jour).getDay() - 1]][heure][0].filter((ele) => {
+  const choosen = tableItems.value[0].jours[journaux.value.joursSemaine[new Date(jour).getDay() - 1]][heure][0].filter((ele) => {
     return comparerArray(ele.AllNumeroEdt, numero);
   });
 
   const element = elementsNonFiltres.value.filter((ele) => ele.CodeElement == choosen[0].CodeElement);
-  const unite = unites.value.filter((uni) => uni.CodeUnite == element[0].CodeUnite);
+  const unite = allData.value.unites.filter((uni) => uni.CodeUnite == element[0].CodeUnite);
 
-  uniteChoisie.value = unite[0].CodeUnite;
+  choosenOne.value.uniteChoisie = unite[0].CodeUnite;
   varierElement();
 
   edtChoisi.value = choosen[0].AllNumeroEdt;
-  classeChoisie.value = choosen[0].CodesClasses;
-  elementChoisi.value = element[0].CodeElement;
-  enseignantChoisi.value = choosen[0].IdEnseignant;
-  salleChoisie.value = choosen[0].NumeroSalle;
-  dateChoisie.value = choosen[0].Date
-  dateChoisieFull.value = new Date(dateChoisie.value);
+  choosenOne.value.classeChoisie = choosen[0].CodesClasses;
+  choosenOne.value.elementChoisi = element[0].CodeElement;
+  choosenOne.value.enseignantChoisi = choosen[0].IdEnseignant;
+  choosenOne.value.salleChoisie = choosen[0].NumeroSalle;
+  choosenOne.value.dateChoisie = choosen[0].Date
+  choosenOne.value.dateChoisieFull = new Date(choosenOne.value.dateChoisie);
 
   editerDialog.value = !editerDialog.value;
 };
@@ -430,11 +447,11 @@ const editerEdt = async () => {
     method: "POST",
     body: {
       numero: edtChoisi.value,
-      classe: classeChoisie.value,
-      element: elementChoisi.value,
-      enseignant: enseignantChoisi.value,
-      salle: salleChoisie.value,
-      date: dateChoisieFull.value,
+      classe: choosenOne.value.classeChoisie,
+      element: choosenOne.value.elementChoisi,
+      enseignant: choosenOne.value.enseignantChoisi,
+      salle: choosenOne.value.salleChoisie,
+      date: choosenOne.value.dateChoisieFull,
     }
   });
   console.log(editer);
@@ -456,12 +473,48 @@ onBeforeMount(async () => {
 
 <template>
   <div>
-    <TimetableTopMenu :indexNiveau="indexNiveau" :niveauxLength="niveaux.length" :niveau="niveau"
-      :debutSemaine="debutSemaine" :finSemaine="finSemaine" @niveauMoins="changerNiveau('moins')"
-      @niveauPlus="changerNiveau('plus')" @semaineMoins="changerSemaine('moins')"
-      @semainePlus="changerSemaine('plus')" />
+    <v-row class="bg-white border rounded-lg mx-auto">
 
-    <!-- <v-row>
+      <v-col cols="12" sm="2"
+        class="text-center text-overline text-md-button d-flex flex-row align-center justify-space-around">
+        <v-btn variant="text" icon="mdi-chevron-left" :disabled="indexNiveau == 0" @click="changerNiveau('moins')" />
+        <h2 class="flex-grow-1">{{ niveau }}</h2>
+        <v-btn variant="text" icon="mdi-chevron-right" :disabled="indexNiveau == (niveaux.length - 1)"
+          @click="changerNiveau('plus')" />
+      </v-col>
+
+      <v-col cols="12" sm="7" class="d-flex flex-row align-center justify-space-around">
+        <v-btn variant="text" icon="mdi-chevron-left" @click="changerSemaine('moins')" />
+        <div
+          class="flex-grow-1 text-center text-overline text-md-button d-flex flex-column flex-md-row align-center justify-space-evenly">
+          <ClientOnly>
+            <h2>
+              {{ journaux.debutLisible }}
+              <span v-if="journaux.debutSemaine.getFullYear() != journaux.finSemaine.getFullYear()">
+                {{ " " + journaux.debutSemaine.getFullYear() }}
+              </span>
+            </h2>
+            <h2>-</h2>
+            <h2>{{ journaux.finLisible }}<span>{{ " " + journaux.finSemaine.getFullYear() }}</span></h2>
+          </ClientOnly>
+        </div>
+        <v-btn variant="text" icon="mdi-chevron-right" @click="changerSemaine('plus')" />
+      </v-col>
+
+      <!-- <v-col cols="12" sm="2">
+        <v-select model-value="dateActuelle" density="compact" variant="outlined" density="default" @click="datePickerMenu = !datePickerMenu">
+        </v-select>
+        <v-menu v-model="datePickerMenu" class="align-center justify-center">
+          <v-date-picker v-model="dateActuelle"></v-date-picker>
+        </v-menu>
+      </v-col> -->
+      <v-col cols="12" sm="1">
+        <v-btn color="success">Ajouter</v-btn>
+      </v-col>
+
+    </v-row>
+
+    <v-row>
       <v-col cols="12">
         <v-data-table :loading="tableLoading" loading-text="aksdjfjaklsdjf" :headers="tableHeaders" :items="tableItems"
           class="border-t border-e border-b rounded mb-4" color="green">
@@ -474,16 +527,16 @@ onBeforeMount(async () => {
                     {{ column.title }}
                   </td>
                 </template>
-<template v-else>
+                <template v-else>
                   <td class="border-s border-b text-center text-overline" width="250px">
                     <span>{{ column.title }}</span>
                   </td>
                 </template>
-</template>
-</tr>
-</template>
+              </template>
+            </tr>
+          </template>
 
-<template v-slot:item="{ item }">
+          <template v-slot:item="{ item }">
             <tr v-for="(heure, index) in item.heures" :key="index">
 
               <td class="border-s px-1">
@@ -494,7 +547,7 @@ onBeforeMount(async () => {
                 </div>
               </td>
 
-              <template v-for="jour in joursSemaine" :key="jour">
+              <template v-for="jour in journaux.joursSemaine" :key="jour">
                 <td class="border-s bg-grey-lighten-5 pa-0">
                   <div class="d-flex flex-row align-stretch justify-space-evenly empty-cell-width">
                     <ClientOnly>
@@ -507,35 +560,35 @@ onBeforeMount(async () => {
                                 <template v-if="occ == 0">
                                   <span>{{ classe }}</span>
                                 </template>
-<template v-else>
+                                <template v-else>
                                   <span>-</span>
                                   <span>{{ classe }}</span>
                                 </template>
-</template>
-</v-card-title>
+                              </template>
+                            </v-card-title>
 
-<v-card-text class="d-flex flex-column align-center justify-center text-wrap">
-  <span class="text-center text-uppercase font-weight-bold">
-    {{ horaire.appelationelement }}
-  </span>
-  <span>{{ horaire.appelationenseignant }}</span>
-  <span>{{ horaire.NumeroSalle }}</span>
-</v-card-text>
-</v-card>
-</template>
-</template>
-<template v-else>
+                            <v-card-text class="d-flex flex-column align-center justify-center text-wrap">
+                              <span class="text-center text-uppercase font-weight-bold">
+                                {{ horaire.appelationelement }}
+                              </span>
+                              <span>{{ horaire.appelationenseignant }}</span>
+                              <span>{{ horaire.NumeroSalle }}</span>
+                            </v-card-text>
+                          </v-card>
+                        </template>
+                      </template>
+                      <template v-else>
                         <div class="empty-cell-width"></div>
                       </template>
-</ClientOnly>
-</div>
-</td>
-</template>
+                    </ClientOnly>
+                  </div>
+                </td>
+              </template>
 
-</tr>
-</template>
+            </tr>
+          </template>
 
-<template v-slot:loading>
+          <template v-slot:loading>
             <v-row>
               <v-col cols="12" class="text-center">
                 <span class="text-subtitle-1">Veuillez patienter...</span>
@@ -543,15 +596,17 @@ onBeforeMount(async () => {
             </v-row>
           </template>
 
-<template v-slot:bottom></template>
-</v-data-table>
-</v-col>
-</v-row> -->
+          <template v-slot:bottom></template>
+        </v-data-table>
+      </v-col>
+    </v-row>
   </div>
 
-  <!-- <TimetableDialogEdit />
+  <TimetableDialogEdit v-model="editerDialog" :all-data="allData" :choosed="choosenOne"
+    @vider-element="choosenOne.elementChoisi = null" @varier-element="varierElement"
+    @close-dialog="editerDialog = !editerDialog" @editer-edt="editerEdt" />
 
-  <TimetableDialogAjout /> -->
+  <!-- <TimetableDialogAjout /> -->
 </template>
 
 <style>
