@@ -14,8 +14,10 @@ export default eventHandler(async (event) => {
             .eq("Date", body.date)
             .eq("NumeroSalle", body.salle)
             .eq("CodeElement", body.element)
-            .eq("IdEnseignant", body.enseignant);
+            .eq("IdEnseignant", body.enseignant)
+            .eq("Horaire", body.horaire);
         actualEDT = EDT;
+        errors.push(error);
     } catch (err) {
         throw err;
     }
@@ -50,6 +52,8 @@ export default eventHandler(async (event) => {
                             CodeElement: body.element,
                             IdEnseignant: body.enseignant,
                             NumeroSalle: body.salle,
+                            Date: body.date,
+                            Horaire: body.horaire,
                         })
                         .eq("NumeroEdt", num)
                         .eq("CodeClasse", body.classe[0]);
@@ -73,6 +77,8 @@ export default eventHandler(async (event) => {
                         CodeElement: body.element,
                         IdEnseignant: body.enseignant,
                         NumeroSalle: body.salle,
+                        Date: body.date,
+                        Horaire: body.horaire,
                     },
                 ]);
             } catch (sqlerror) {
@@ -89,6 +95,8 @@ export default eventHandler(async (event) => {
                         CodeElement: body.element,
                         IdEnseignant: body.enseignant,
                         NumeroSalle: body.salle,
+                        Date: body.date,
+                        Horaire: body.horaire,
                     })
                     .eq("NumeroEdt", body.numero[index]);
 

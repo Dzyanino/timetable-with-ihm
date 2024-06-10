@@ -11,5 +11,5 @@ export default eventHandler(async (event) => {
         .gte("Date", body.debutSemaine)
         .lte("Date", body.finSemaine);
 
-    return { edt_: data };
+    return { view_edt: data };
 });

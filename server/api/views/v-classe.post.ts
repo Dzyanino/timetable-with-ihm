@@ -9,5 +9,5 @@ export default eventHandler(async (event) => {
         .select("*")
         .eq("CodeNiveau", body.niveau);
 
-    return { classe_: data };
+    return { view_classe: data };
 });

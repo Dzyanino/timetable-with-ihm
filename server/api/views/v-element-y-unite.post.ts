@@ -8,6 +8,6 @@ export default eventHandler(async (event) => {
         .from("element_view")
         .select("*")
         .eq("Niveau", body.niveau);
-    
-    return { element_unite: data };
+
+    return { view_element_unite: data };
 });
