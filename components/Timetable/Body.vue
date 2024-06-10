@@ -1,6 +1,6 @@
 <script setup>
 // CONSTANTES ----------------------------------------------------------------------------------
-const tableHeaders = ref([
+const tableHeaders = [
   {
     title: "#",
     key: "#",
@@ -43,7 +43,7 @@ const tableHeaders = ref([
     sortable: false,
     minWidth: "250px",
   },
-]);
+];
 const tableItems = ref([
   {
     heures: [
@@ -118,6 +118,7 @@ const journaux = ref({
 
 let indexNiveau = 0;
 const niveaux = ["L1", "L2", "L3", "M1", "M2"];
+const horaires = { "07:30 - 09:00": 1, "09:00 - 10:30": 2, "10:30 - 12:00": 3, "13:30 - 15:00": 4, "15:00 - 16:30": 5, "16:30 - 18:00": 6 }
 const niveau = ref(niveaux[indexNiveau]);
 
 const elementsNonFiltres = ref([]);
@@ -127,6 +128,7 @@ const allData = ref({
   unites: [],
   enseignants: [],
   salles: [],
+  horaires: tableItems.value[0].heures,
 });
 
 const edtChoisi = ref(null);
@@ -138,10 +140,12 @@ const choosenOne = ref({
   salleChoisie: null,
   dateChoisie: null,
   dateChoisieFull: null,
+  horaireChoisi: null,
 })
 
 const tableLoading = ref(true);
 const editerDialog = ref(false);
+const snackbar = ref(false);
 // const ajouterDialog = ref(false);
 // CONSTANTES ----------------------------------------------------------------------------------
 
@@ -258,7 +262,7 @@ const remplirTableItems = async (data) => {
 const initDonnees = useDebounce(async () => {
   /*   BDD[...] ==> edt[...]   */
   tableLoading.value = true;
-  const { edt_ } = await $fetch("/api/edt_", {
+  const { view_edt } = await $fetch("/api/views/v-edt", {
     method: "POST",
     body: {
       niveau: niveau.value,
@@ -266,12 +270,12 @@ const initDonnees = useDebounce(async () => {
       finSemaine: formatterDate(journaux.value.finSemaine),
     },
   });
-  console.log(edt_);
-
-  setTimeout(async () => {
-    await remplirTableItems(await fusionnerSimilaire(edt_));
-    tableLoading.value = false;
-  }, 750);
+  if (!!view_edt) {
+    setTimeout(async () => {
+      await remplirTableItems(await fusionnerSimilaire(view_edt));
+      tableLoading.value = false;
+    }, 750);
+  }
 }, 1000);
 const retrieveMainData = async () => {
   /*   Retrieve EDT   */
@@ -355,33 +359,33 @@ const nommerEnseignant = async (data) => {
   return transformerArray(enseignantNomme);
 };
 const retrieveOtherData = useDebounce(async () => {
-  const { classe_ } = await $fetch("/api/classe_", {
+  const { view_classe } = await $fetch("/api/views/v-classe", {
     method: "POST",
     body: {
       niveau: niveau.value,
     },
   });
 
-  const { unite } = await $fetch("/api/unite", {
+  const { unite } = await $fetch("/api/data/unite", {
     method: "POST",
     body: {
       niveau: niveau.value,
     },
   });
 
-  const { element } = await $fetch("/api/element", {
+  const { element } = await $fetch("/api/data/element", {
     method: "POST",
   });
 
-  const { enseignant } = await $fetch("/api/enseignant", {
+  const { enseignant } = await $fetch("/api/data/enseignant", {
     method: "POST",
   });
 
-  const { salle } = await $fetch("/api/salle", {
+  const { salle } = await $fetch("/api/data/salle", {
     method: "POST",
   });
 
-  allData.value.classes = await nommerClasse(classe_);
+  allData.value.classes = await nommerClasse(view_classe);
   allData.value.unites = await nommerUnite(unite);
   elementsNonFiltres.value = await nommerElement(element);
   allData.value.enseignants = await nommerEnseignant(enseignant);
@@ -419,6 +423,7 @@ const varierElement = () => {
   allData.value.elements = elementsNonFiltres.value.filter((ele) => {
     return choosenOne.value.uniteChoisie == ele.CodeUnite;
   });
+  choosenOne.value.elementChoisi = null
 };
 const afficherEditerDialog = (jour, heure, numero) => {
   const choosen = tableItems.value[0].jours[journaux.value.joursSemaine[new Date(jour).getDay() - 1]][heure][0].filter((ele) => {
@@ -436,8 +441,9 @@ const afficherEditerDialog = (jour, heure, numero) => {
   choosenOne.value.elementChoisi = element[0].CodeElement;
   choosenOne.value.enseignantChoisi = choosen[0].IdEnseignant;
   choosenOne.value.salleChoisie = choosen[0].NumeroSalle;
-  choosenOne.value.dateChoisie = choosen[0].Date
+  choosenOne.value.dateChoisie = choosen[0].Date;
   choosenOne.value.dateChoisieFull = new Date(choosenOne.value.dateChoisie);
+  choosenOne.value.horaireChoisi = tableItems.value[0].heures[choosen[0].Horaire - 1];
 
   editerDialog.value = !editerDialog.value;
 };
@@ -452,6 +458,7 @@ const editerEdt = async () => {
       enseignant: choosenOne.value.enseignantChoisi,
       salle: choosenOne.value.salleChoisie,
       date: choosenOne.value.dateChoisieFull,
+      horaire: horaires[choosenOne.value.horaireChoisi],
     }
   });
   console.log(editer);
@@ -466,8 +473,6 @@ onBeforeMount(async () => {
   await retrieveMainData();
   await retrieveOtherData();
 });
-// onMounted(async () => {
-// });
 // BUILT-IN FUNCTION -----------------------------------------------------------------------------------
 </script>
 
@@ -600,10 +605,11 @@ onBeforeMount(async () => {
         </v-data-table>
       </v-col>
     </v-row>
+
+    <FeedbackSnackbar :model-value="snackbar" @close="snackbar = !snackbar" />
   </div>
 
-  <TimetableDialogEdit v-model="editerDialog" :all-data="allData" :choosed="choosenOne"
-    @vider-element="choosenOne.elementChoisi = null" @varier-element="varierElement"
+  <TimetableDialogEdit v-model="editerDialog" :all-data="allData" :choosed="choosenOne" @varier-element="varierElement"
     @close-dialog="editerDialog = !editerDialog" @editer-edt="editerEdt" />
 
   <!-- <TimetableDialogAjout /> -->

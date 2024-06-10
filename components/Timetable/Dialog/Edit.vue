@@ -19,6 +19,10 @@ const menu = ref(false);
 const formattedDate = computed(() => {
     return propss.choosed.dateChoisieFull ? propss.choosed.dateChoisieFull.toLocaleDateString("fr") : "";
 });
+
+const test = () => {
+    console.log(propss.choosed.classeChoisie);
+}
 </script>
 
 <template>
@@ -29,17 +33,17 @@ const formattedDate = computed(() => {
             </v-card-title>
             <v-card-text>
                 <v-row>
-                    <v-col cols="12" md="5">
+                    <v-col cols="12" md="4">
                         <v-autocomplete v-model="choosed.classeChoisie" :items="allData.classes" item-props="Titre"
                             item-value="CodeClasse" variant="outlined" density="default" no-data-text="Vide..."
-                            label="Classe" multiple chips auto-select-first clear-on-select />
+                            label="Classe" multiple chips auto-select-first clear-on-select @update:modelValue="test" />
                     </v-col>
-                    <v-col cols="12" md="7">
+                    <v-col cols="12" md="4">
                         <v-menu v-model="menu" :close-on-content-click="false" transition="scale-transition" lazy
                             offset-y>
                             <template v-slot:activator="{ props }">
                                 <v-text-field v-model="formattedDate" variant="outlined" density="default"
-                                    append-inner-icon="mdi-calendar" v-bind="props" no-title hide-details readonly />
+                                    append-inner-icon="mdi-calendar" v-bind="props" hide-details readonly />
                             </template>
                             <v-date-picker title="Choisissez une date" first-day-of-week="1"
                                 v-model="choosed.dateChoisieFull">
@@ -49,11 +53,15 @@ const formattedDate = computed(() => {
                             </v-date-picker>
                         </v-menu>
                     </v-col>
+                    <v-col cols="12" md="4">
+                        <v-autocomplete v-model="choosed.horaireChoisi" :items="allData.horaires" variant="outlined"
+                            density="default" no-data-text="Vide..." label="Heure" auto-select-first clear-on-select />
+                    </v-col>
                     <v-col cols="12">
                         <v-autocomplete v-model="choosed.uniteChoisie" :items="allData.unites" item-props="Titre"
                             item-value="CodeUnite" variant="outlined" density="default" no-data-text="Vide..."
-                            label="Unité d'enseignement" @update:modelValue="$emit('vider-element')"
-                            @update:model-value="$emit('varier-element')" auto-select-first />
+                            label="Unité d'enseignement" @update:model-value="$emit('varier-element')"
+                            auto-select-first />
                     </v-col>
                     <v-col cols="12">
                         <v-autocomplete :disabled="(choosed.uniteChoisie == null)" v-model="choosed.elementChoisi"
