@@ -448,8 +448,14 @@ const afficherEditerDialog = (jour, heure, numero) => {
   editerDialog.value = !editerDialog.value;
 };
 
+const dbCompatibleDate = (date) => {
+  const compatibleDate = [date.getFullYear(), (date.getMonth() + 1).toString().padStart(2, "0"), date.getDate()];
+  return compatibleDate.join("-");
+}
 const editerEdt = async () => {
-  const editer = await $fetch("/api/actions/edit_edt", {
+  const chemin = choosenOne.value.classeChoisie.length < edtChoisi.value ? "edt_edit_delete" : choosenOne.value.classeChoisie.length > edtChoisi.value ? "edt_edit_add" : "edt_edit";
+
+  const editer = await $fetch("/api/actions/" + chemin, {
     method: "POST",
     body: {
       numero: edtChoisi.value,
@@ -457,7 +463,7 @@ const editerEdt = async () => {
       element: choosenOne.value.elementChoisi,
       enseignant: choosenOne.value.enseignantChoisi,
       salle: choosenOne.value.salleChoisie,
-      date: choosenOne.value.dateChoisieFull,
+      date: dbCompatibleDate(choosenOne.value.dateChoisieFull),
       horaire: horaires[choosenOne.value.horaireChoisi],
     }
   });
