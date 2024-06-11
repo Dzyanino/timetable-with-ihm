@@ -453,9 +453,9 @@ const dbCompatibleDate = (date) => {
   return compatibleDate.join("-");
 }
 const editerEdt = async () => {
-  const chemin = choosenOne.value.classeChoisie.length < edtChoisi.value ? "edt_edit_delete" : choosenOne.value.classeChoisie.length > edtChoisi.value ? "edt_edit_add" : "edt_edit";
+  const chemin = choosenOne.value.classeChoisie.length < edtChoisi.value.length ? "edt_edit_delete" : choosenOne.value.classeChoisie.length > edtChoisi.value.length ? "edt_edit_add" : "edt_edit";
 
-  const editer = await $fetch("/api/actions/" + chemin, {
+  const editer = await $fetch("/api/actions/edt/" + chemin, {
     method: "POST",
     body: {
       numero: edtChoisi.value,
