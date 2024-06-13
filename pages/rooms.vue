@@ -1,7 +1,6 @@
 <template>
   <div>
     <p>rooms</p>
-    <NuxtWelcome />
   </div>
 </template>
 

@@ -141,10 +141,24 @@ const choosenOne = ref({
     dateChoisie: null,
     dateChoisieFull: null,
     horaireChoisi: null,
-})
+});
+
+const addOne = ref({
+    classeChoisie: null,
+    elementChoisi: null,
+    uniteChoisie: null,
+    enseignantChoisi: null,
+    salleChoisie: null,
+    dateChoisie: null,
+    dateChoisieFull: null,
+    horaireChoisi: null,
+});
 
 const tableLoading = ref(true);
+const sure = ref(false);
 const editerDialog = ref(false);
+const ajouterDialog = ref(false);
+
 const snackbarProps = ref({
     seen: false,
     color: "primary",
@@ -157,12 +171,8 @@ const notifProps = ref({
 });
 
 
-const pdfSection = ref < HTMLElement | null > (null);
-// const document_options = ref({
-//     orientation: "landscape",
-//     scale: 0.5,
-//     format: "a4"
-// });
+const pdfSection = ref(null);
+
 // CONSTANTES ----------------------------------------------------------------------------------
 
 
@@ -436,10 +446,18 @@ const changerSemaine = async (sens) => {
 
 
 const varierElement = () => {
-    allData.value.elements = elementsNonFiltres.value.filter((ele) => {
-        return choosenOne.value.uniteChoisie == ele.CodeUnite;
-    });
-    choosenOne.value.elementChoisi = null
+    if (editerDialog.value == true) {
+        allData.value.elements = elementsNonFiltres.value.filter((ele) => {
+            return choosenOne.value.uniteChoisie == ele.CodeUnite;
+        });
+        choosenOne.value.elementChoisi = null
+    }
+    else if (ajouterDialog.value == true) {
+        allData.value.elements = elementsNonFiltres.value.filter((ele) => {
+            return addOne.value.uniteChoisie == ele.CodeUnite;
+        });
+        addOne.value.elementChoisi = null
+    }
 };
 const afficherEditerDialog = (jour, heure, numero) => {
     const choosen = tableItems.value[0].jours[journaux.value.joursSemaine[new Date(jour).getDay() - 1]][heure][0].filter((ele) => {
@@ -467,7 +485,9 @@ const afficherEditerDialog = (jour, heure, numero) => {
 const dbCompatibleDate = (date) => {
     const compatibleDate = [date.getFullYear(), (date.getMonth() + 1).toString().padStart(2, "0"), date.getDate()];
     return compatibleDate.join("-");
-}
+};
+
+
 const editerEdt = async () => {
     const chemin = choosenOne.value.classeChoisie.length < edtChoisi.value.length ? "edt_edit_delete" : choosenOne.value.classeChoisie.length > edtChoisi.value.length ? "edt_edit_add" : "edt_edit";
 
@@ -495,8 +515,71 @@ const editerEdt = async () => {
         snackbarProps.value.color = "success"
         snackbarProps.value.seen = true;
 
-        await initDonnees();
+        setTimeout(async () => { await initDonnees() }, 250);
     }
+};
+const ajouterEdt = async () => {
+    const ajouter = await $fetch("/api/actions/edt/edt_add", {
+        method: "POST",
+        body: {
+            classe: addOne.value.classeChoisie,
+            element: addOne.value.elementChoisi,
+            enseignant: addOne.value.enseignantChoisi,
+            salle: addOne.value.salleChoisie,
+            date: dbCompatibleDate(addOne.value.dateChoisieFull),
+            horaire: horaires[addOne.value.horaireChoisi],
+        }
+    });
+
+    ajouterDialog.value = false;
+
+    if (ajouter[0] != null) {
+        notifProps.value.titre = "Erreur";
+        notifProps.value.message = "Une erreur est survenue. Veuillez réessayer";
+        notifProps.value.seen = true;
+    } else {
+        snackbarProps.value.message = "Cours ajouté";
+        snackbarProps.value.color = "success"
+        snackbarProps.value.seen = true;
+
+        setTimeout(async () => { await initDonnees() }, 250);
+    }
+};
+const supprimerEdt = async () => {
+    const supprimer = await $fetch("/api/actions/edt/edt_delete", {
+        method: "POST",
+        body: {
+            numero: edtChoisi.value,
+        }
+    });
+
+    sure.value = false;
+    editerDialog.value = false;
+
+    if (supprimer[0] != null) {
+        notifProps.value.titre = "Erreur";
+        notifProps.value.message = "Une erreur est survenue. Veuillez réessayer";
+        notifProps.value.seen = true;
+    } else {
+        snackbarProps.value.message = "Cours supprimé";
+        snackbarProps.value.color = "success"
+        snackbarProps.value.seen = true;
+
+        setTimeout(async () => { await initDonnees() }, 250);
+    }
+}
+
+const viderAjoutDialog = () => {
+    addOne.value.classeChoisie = null
+    addOne.value.elementChoisi = null
+    addOne.value.uniteChoisie = null
+    addOne.value.enseignantChoisi = null
+    addOne.value.salleChoisie = null
+    addOne.value.dateChoisie = null
+    addOne.value.dateChoisieFull = null
+    addOne.value.horaireChoisi = null
+
+    ajouterDialog.value = false;
 }
 // MADE FONCTIONS -----------------------------------------------------------------------------------
 
@@ -550,11 +633,11 @@ onBeforeMount(async () => {
         </v-menu>
       </v-col> -->
             <v-col cols="12" sm="1">
-                <v-btn color="primary" size="small">Ajouter</v-btn>
+                <v-btn color="secondary" size="small" @click="ajouterDialog = !ajouterDialog">Ajouter</v-btn>
             </v-col>
 
             <v-col cols="12" sm="1">
-                <v-btn color="secondary" size="small" @click="exportToPDF(
+                <v-btn color="primary" size="small" @click="exportToPDF(
                     `${niveau}-${journaux.debutLisible}-${journaux.finLisible}.pdf`,
                     pdfSection, { orientation: 'l', unit: 'pt', format: 'a2' })">
                     Exporter
@@ -630,6 +713,7 @@ onBeforeMount(async () => {
                                                                 <span>{{ horaire.NumeroSalle }}</span>
                                                             </v-card-text>
                                                         </v-card>
+
                                                     </template>
                                                 </template>
                                                 <template v-else>
@@ -658,13 +742,30 @@ onBeforeMount(async () => {
         </v-row>
 
     </div>
-    <FeedSnack :model-value="snackbarProps.seen" :message="snackbarProps.message" :color="snackbarProps.color"
-        @close="snackbarProps.seen = !snackbarProps.seen" />
 
     <EdtDialogEdit v-model="editerDialog" :all-data="allData" :choosed="choosenOne" @varier-element="varierElement"
-        @close-dialog="editerDialog = !editerDialog" @editer-edt="editerEdt" />
+        @close-dialog="editerDialog = !editerDialog" @editer-edt="editerEdt" @supprimer-edt="sure = !sure" />
 
-    <!-- <TimetableDialogAjout /> -->
+    <EdtDialogAjout v-model="ajouterDialog" :all-data="allData" :choosed="addOne" @varier-element="varierElement"
+        @close-dialog="viderAjoutDialog()" @add-edt="ajouterEdt" />
+
+    <v-dialog v-model="sure" persistent max-width="550px" transition="scroll-y-reverse-transition">
+        <v-card>
+            <v-card-title class="text-button">
+                <h3>Attention</h3>
+            </v-card-title>
+            <v-card-text>
+                <span>Etes-vous sûr(e) ?</span>
+            </v-card-text>
+            <v-card-actions>
+                <v-btn @click="sure = false">Annuler</v-btn>
+                <v-btn @click="supprimerEdt">Ok</v-btn>
+            </v-card-actions>
+        </v-card>
+    </v-dialog>
+
+    <FeedSnack :model-value="snackbarProps.seen" :message="snackbarProps.message" :color="snackbarProps.color"
+        @close="snackbarProps.seen = !snackbarProps.seen" />
 
     <FeedDialog v-model="notifProps.seen" :titre="notifProps.titre" :message="notifProps.message"
         @close-dialog="notifProps.seen = !notifProps.seen" />

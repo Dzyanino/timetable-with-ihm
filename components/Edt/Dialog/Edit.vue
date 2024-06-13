@@ -80,9 +80,13 @@ const test = () => {
                     </v-col>
                 </v-row>
             </v-card-text>
-            <v-card-actions class="d-flex justify-end">
-                <v-btn @click="$emit('close-dialog')">fermer</v-btn>
-                <v-btn @click="$emit('editer-edt')">ok</v-btn>
+            <v-card-actions class="d-flex justify-space-between">
+                <v-btn @click="$emit('supprimer-edt')" icon="mdi-delete" color="text-red"></v-btn>
+
+                <div>
+                    <v-btn @click="$emit('close-dialog')">fermer</v-btn>
+                    <v-btn @click="$emit('editer-edt')">ok</v-btn>
+                </div>
             </v-card-actions>
         </v-card>
     </v-dialog>
