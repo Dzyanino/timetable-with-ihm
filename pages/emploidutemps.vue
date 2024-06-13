@@ -1,6 +1,6 @@
 <template>
   <v-container fluid class="px-2 px-md-4 px-lg-8">
-    <TimetableBody />
+    <EdtMainBody />
   </v-container>
 </template>
 

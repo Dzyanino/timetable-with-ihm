@@ -13,7 +13,12 @@ export default defineNuxtConfig({
         pageTransition: { name: "slide", mode: "out-in" },
     },
 
-    modules: ["@nuxtjs/supabase", "vuetify-nuxt-module", "nuxt-lodash"],
+    modules: [
+        "@nuxtjs/supabase",
+        "vuetify-nuxt-module",
+        "nuxt-lodash",
+        "@sidebase/nuxt-pdf",
+    ],
 
     supabase: {
         url: process.env.SUPABASE_URL,

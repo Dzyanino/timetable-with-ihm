@@ -12,15 +12,11 @@ const props = defineProps({
         type: String,
         default: "Lorem, ipsum dolor sit amet consectetur adipisicing elit. Ea rerum asperiores quia consectetur velit, laudantium suscipit incidunt illo voluptates praesentium numquam eos repudiandae nostrum autem dolorem expedita mollitia dignissimos? Dolorem."
     },
-    timeout: {
-        type: Number,
-        default: 3000
-    }
 })
 </script>
 
 <template>
-    <v-snackbar :model-value="modelValue" :color="color" transition="slide-y-reverse-transition" :timeout="timeout">
+    <v-snackbar :model-value="modelValue" :color="color" transition="slide-y-reverse-transition" :timeout="3000">
         <template v-slot:text>
             <span>{{ message }}</span>
         </template>

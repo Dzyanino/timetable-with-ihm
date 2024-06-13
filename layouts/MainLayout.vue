@@ -22,8 +22,8 @@
 
       <div class="d-none d-md-flex">
         <template v-for="postLink in navBarLink[1]" :key="postLink.to">
-          <v-btn size="small" :prepend-icon="'mdi-' + postLink.icon" :text="postLink.label" :to="postLink.to"
-            class="mx-1" />
+          <v-btn size="small" target="_blank" :prepend-icon="'mdi-' + postLink.icon" :text="postLink.label"
+            href="https://github.com/Dzyanino" class="mx-1" />
         </template>
       </div>
     </v-app-bar>
@@ -32,17 +32,17 @@
       <template v-for="preLink in navBarLink[0]" :key="preLink.to" class="d-flex d-md-none">
         <v-list-item :prepend-icon="'mdi-' + preLink.icon" :to="preLink.to" class="py-3">
           <v-list-item-title class="text-overline">{{
-      preLink.label
-    }}</v-list-item-title>
+            preLink.label
+          }}</v-list-item-title>
         </v-list-item>
       </template>
       <template v-slot:append>
         <v-divider />
         <template v-for="postLink in navBarLink[1]" :key="postLink.to" class="d-flex d-md-none">
-          <v-list-item :prepend-icon="'mdi-' + postLink.icon" :to="postLink.to" class="py-3">
+          <v-list-item :prepend-icon="'mdi-' + postLink.icon" link href="https://github.com/Dzyanino" class="py-3">
             <v-list-item-title class="text-overline">{{
-      postLink.label
-    }}</v-list-item-title>
+              postLink.label
+            }}</v-list-item-title>
           </v-list-item>
         </template>
       </template>
@@ -79,11 +79,11 @@ const navBarLink = ref([
     },
   ],
   [
-    {
-      label: "Aide",
-      to: "/help",
-      icon: "help-circle-outline",
-    },
+    // {
+    //   label: "Aide",
+    //   to: "/help",
+    //   icon: "help-circle-outline",
+    // },
     {
       label: "A propos",
       to: "/about",

@@ -1,6 +1,7 @@
 <template>
   <div>
     <p>courses</p>
+    <NuxtWelcome />
   </div>
 </template>
 
